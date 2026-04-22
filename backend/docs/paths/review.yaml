@@ -1,0 +1,166 @@
+products/{id}/reviews:
+  get:
+    tags:
+      - Product
+    summary: Lấy danh sách đánh giá của sản phẩm
+    description: Trả về tất cả các bình luận và xếp hạng sao của sản phẩm.
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        description: ID của sản phẩm cần lấy đánh giá
+        schema:
+          type: string
+          example: 672d20abcf3b4f5d76a12c3f
+    responses:
+      "200":
+        description: Danh sách đánh giá trả về thành công
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                count:
+                  type: integer
+                  example: 3
+                reviews:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: 67301234567890abcdef123
+                      rating:
+                        type: number
+                        example: 4
+                      comment:
+                        type: string
+                        example: "Giao hàng nhanh, chất lượng ổn!"
+                      user:
+                        type: object
+                        properties:
+                          name: { type: string, example: "Nguyễn Văn A" }
+                          email: { type: string, example: "a.nguyen@example.com" }
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: 2025-11-02T12:11:00.000Z
+      "404":
+        description: Product not found
+      "500":
+        description: Internal server error
+
+  post:
+    tags:
+      - Product
+    summary: Thêm đánh giá mới cho sản phẩm
+    description: |
+      Cho phép người dùng đăng bình luận hoặc đánh giá sao cho sản phẩm.
+      - Bình luận có thể gửi mà không cần đăng nhập.
+      - Đánh giá sao yêu cầu đăng nhập.
+      - Tự động cập nhật điểm trung bình (averageRating) của sản phẩm.
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        description: ID sản phẩm cần đánh giá
+        schema:
+          type: string
+          example: 672d20abcf3b4f5d76a12c3f
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - comment
+            properties:
+              rating:
+                type: number
+                description: Số sao đánh giá (1–5)
+                example: 5
+              comment:
+                type: string
+                description: Nội dung đánh giá
+                example: "Chất lượng rất tốt, giao hàng đúng hẹn!"
+              userId:
+                type: string
+                description: ID người dùng (nếu đăng nhập)
+                example: 672c0fbef3b4f5d76a12a999
+    responses:
+      "201":
+        description: Review added successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: "Review added successfully"
+                review:
+                  type: object
+                  properties:
+                    _id: { type: string, example: 67301234567890abcdef123 }
+                    product: { type: string, example: 672d20abcf3b4f5d76a12c3f }
+                    user: { type: string, example: 672c0fbef3b4f5d76a12a999 }
+                    rating: { type: number, example: 5 }
+                    comment: { type: string, example: "Great quality!" }
+                    createdAt:
+                      type: string
+                      format: date-time
+                      example: 2025-11-02T12:11:00.000Z
+                averageRating:
+                  type: number
+                  example: 4.8
+      "400":
+        description: Thiếu trường hoặc dữ liệu không hợp lệ
+      "404":
+        description: Product not found
+      "500":
+        description: Lỗi server nội bộ
+
+products/{id}/reviews/{id}:
+  delete:
+    tags:
+      - Product
+    summary: Xóa một đánh giá cụ thể
+    description: |
+      Chỉ người tạo đánh giá hoặc admin mới có quyền xóa.
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          example: 672d20abcf3b4f5d76a12c3f
+      - name: reviewId
+        in: path
+        required: true
+        schema:
+          type: string
+          example: 67301234567890abcdef123
+    responses:
+      "200":
+        description: Review deleted successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success: { type: boolean, example: true }
+                message: { type: string, example: "Review deleted" }
+      "403":
+        description: Không có quyền xóa review
+      "404":
+        description: Review không tồn tại
+      "500":
+        description: Internal server error

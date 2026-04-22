@@ -1,0 +1,71 @@
+/discounts:
+  post:
+    tags: [Admin]
+    summary: Create discount code
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: string
+                example: SALE5
+              description:
+                type: string
+                example: Giảm giá mùa hè
+              percentage:
+                type: number
+                example: 10
+              usageLimit:
+                type: integer
+                example: 10
+    responses:
+      '201':
+        description: Discount created successfully
+  get:
+    tags: [Admin]
+    summary: Get all discount codes
+    responses:
+      '200':
+        description: List of discount codes
+
+/discounts/{id}:
+  put:
+    tags: [Admin]
+    summary: Update discount code
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              description:
+                type: string
+              percentage:
+                type: number
+              usageLimit:
+                type: integer
+    responses:
+      '200':
+        description: Updated successfully
+  delete:
+    tags: [Admin]
+    summary: Delete discount code
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Discount deleted

@@ -1,0 +1,82 @@
+/checkout/:
+  post:
+    tags: [Checkout]
+    summary: Checkout process (Guest + Logged-in)
+    description: |
+      Xử lý đặt hàng cho cả khách (guest) và người dùng đã đăng nhập.
+      - Nếu người mua chưa có tài khoản, hệ thống sẽ **tự tạo tài khoản dựa trên email**.
+      - Nếu đã đăng nhập, **địa chỉ mặc định của user sẽ được dùng** (và có thể thêm địa chỉ mới).
+      - Sau khi thanh toán thành công, **giỏ hàng sẽ bị xóa**.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - email
+              - fullname
+              - shippingAddress
+              - paymentMethod
+            properties:
+              email:
+                type: string
+                example: khachhang@example.com
+              fullname:
+                type: string
+                example: Nguyễn Văn A
+              phone:
+                type: string
+                example: "0987654321"
+              shippingAddress:
+                type: string
+                example: 123 Lê Lợi, Quận 1, TP. Hồ Chí Minh
+              paymentMethod:
+                type: string
+                enum: [COD, CreditCard, Momo, ZaloPay]
+                example: COD
+    responses:
+      '200':
+        description: Checkout completed successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: Order placed successfully
+                order:
+                  $ref: '../components/schemas.yaml#/OrderResponse'
+                userCreated:
+                  type: boolean
+                  example: true
+      '400':
+        description: Invalid input or empty cart
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: false
+                message:
+                  type: string
+                  example: Cart is empty
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: false
+                message:
+                  type: string
+                  example: Internal Server Error

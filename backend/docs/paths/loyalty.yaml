@@ -1,0 +1,89 @@
+user/{id}/loyalty:
+  get:
+    tags: [Loyalty]
+    summary: Get user's loyalty point balance
+    description: |
+      Retrieve the total accumulated, used, and available loyalty points for a specific user.  
+      Loyalty points are earned automatically when placing orders (10% of total order value).  
+      These points can later be redeemed to reduce future payments.
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: User ID
+    responses:
+      "200":
+        description: Loyalty point balance retrieved successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/LoyaltyBalance"
+      "401":
+        description: Unauthorized (missing or invalid token)
+      "404":
+        description: User not found
+      "500":
+        description: Internal Server Error
+
+  patch:
+    tags: [Loyalty]
+    summary: Update user's loyalty points
+    description: |
+      Used to **add** or **deduct** loyalty points from a user's account.  
+      Typically called when:
+      - An order is placed (add 10% loyalty automatically).  
+      - A user redeems points for a purchase.  
+      - Admin manually adjusts the user's points.
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: User ID
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [action, points]
+            properties:
+              action:
+                type: string
+                enum: [add, deduct]
+                example: add
+                description: Action to perform on loyalty points
+              points:
+                type: number
+                example: 150
+                description: Number of points to add or deduct
+              reason:
+                type: string
+                example: "Reward for order #ORD12345"
+                description: Reason for the point update
+    responses:
+      "200":
+        description: Loyalty points updated successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success: { type: boolean, example: true }
+                message: { type: string, example: "Added 150 loyalty points successfully" }
+                newBalance: { type: number, example: 900 }
+      "400":
+        description: Invalid request or insufficient points
+      "401":
+        description: Unauthorized
+      "404":
+        description: User not found
+      "500":
+        description: Internal Server Error

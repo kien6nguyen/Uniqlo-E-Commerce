@@ -1,0 +1,63 @@
+/* KHÔI PHỤC THANH CUỘN VÀ TÙY CHỈNH STYLE CHO TINH TẾ */
+* {
+  scrollbar-width: auto;
+  -ms-overflow-style: auto;
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #fff; /* White background as default for auth pages */
+}
+
+/* Scrollbar Style */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Sao được chọn */
+.p-rating .p-rating-icon.pi.pi-star-fill {
+  color: #facc15 !important; /* vàng */
+}
+
+/* Sao chưa chọn */
+.p-rating .p-rating-icon.pi.pi-star {
+  color: #d1d5db !important; /* xám nhạt */
+}
+
+.bg-color-gradient {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0) 100%);
+}
+
+/* Uniqlo Global Overrides */
+:root {
+  --uq-red: #ff0000;
+  --uq-black: #000000;
+  --uq-white: #ffffff;
+  --uq-gray: #f4f4f4;
+  --uq-border: #e0e0e0;
+}
+
+/* Button & Form Sharp Edges */
+button, .p-button, .p-inputtext, .p-dropdown {
+  border-radius: 0 !important;
+}
+
+.p-inputtext:focus {
+  border-color: var(--uq-black) !important;
+  box-shadow: none !important;
+}

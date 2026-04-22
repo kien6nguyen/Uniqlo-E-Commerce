@@ -1,0 +1,348 @@
+products:
+  post:
+    tags: [Product]
+    summary: Thêm sản phẩm mới (upload ảnh thực tế)
+    description: |
+      Cho phép thêm mới sản phẩm với khả năng upload ảnh thật.  
+      Hỗ trợ upload nhiều ảnh cùng lúc, mỗi ảnh được lưu trên Cloudinary.  
+      Các URL ảnh sẽ được lưu trong cơ sở dữ liệu.
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required:
+              - name
+              - price
+            properties:
+              name:
+                type: string
+                example: "Áo Hoodie Nam"
+              price:
+                type: number
+                example: 250000
+              category:
+                type: string
+                example: "Thời trang"
+              brand:
+                type: string
+                example: "Coolmate"
+              stock:
+                type: integer
+                example: 10
+              isHotDeal:
+                type: boolean
+                default: false
+                description: Đánh dấu sản phẩm là Hot Deal
+                example: true
+              description:
+                type: string
+                example: "Áo hoodie chất nỉ, co giãn 4 chiều, phù hợp unisex."
+              tags:
+                type: array
+                items:
+                  type: string
+                example: ["hoodie", "coolmate", "unisex"]
+              images:
+                type: array
+                items:
+                  type: string
+                  format: binary
+                description: Upload nhiều ảnh sản phẩm (jpeg, png, webp)
+    responses:
+      "201":
+        description: Thêm sản phẩm thành công
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/Product"
+      "400":
+        description: Thiếu thông tin hoặc dữ liệu không hợp lệ
+      "500":
+        description: Lỗi máy chủ
+  get:
+      tags: [Product]
+      summary: Get products with search, filtering, sorting and pagination
+      description: >
+        This endpoint returns products based on search query, filtering (brand,
+        category, price range, rating, stock, isHotDeal), sorting and pagination.
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search by name, description, or SKU (case-insensitive)
+
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: Filter by category
+
+        - in: query
+          name: brand
+          schema:
+            type: string
+          description: Filter by brand
+        
+        - in: query
+          name: isHotDeal
+          schema:
+            type: boolean
+          description: Filter by Hot Deal status (true/false)
+
+        - in: query
+          name: minPrice
+          schema:
+            type: number
+          description: Minimum price
+
+        - in: query
+          name: maxPrice
+          schema:
+            type: number
+          description: Maximum price
+
+        - in: query
+          name: minRating
+          schema:
+            type: number
+          description: Minimum average rating (0–5)
+
+        - in: query
+          name: inStock
+          schema:
+            type: string
+            enum: [true, false]
+          description: Filter products that are in stock
+
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum:
+              - name_asc
+              - name_desc
+              - price_asc
+              - price_desc
+              - newest
+              - oldest
+          description: Sorting criteria
+
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+          description: Number of products per page
+
+      responses:
+        200:
+          description: Successfully returned filtered products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+                  total:
+                    type: integer
+                    description: Total number of matching products
+                  totalPages:
+                    type: integer
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "67ac5c5d2f1a8b34a0f9a312"
+                        name:
+                          type: string
+                          example: "iPhone 14 Pro Max"
+                        brand:
+                          type: string
+                          example: "Apple"
+                        category:
+                          type: string
+                          example: "Smartphone"
+                        price:
+                          type: number
+                          example: 1299
+                        stock:
+                          type: number
+                          example: 12
+                        averageRating:
+                          type: number
+                          example: 4.5
+                        isHotDeal:
+                          type: boolean
+                          example: true
+                        images:
+                          type: array
+                          items:
+                            type: string
+                        createdAt:
+                          type: string
+                          example: "2025-01-10T14:12:00.000Z"
+        500:
+          description: Internal server error 
+products/{id}:
+  get:
+    tags: [Product]
+    summary: Lấy chi tiết sản phẩm
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    responses:
+      "200":
+        description: Chi tiết sản phẩm
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/Product"
+  put:
+    tags: [Product]
+    summary: Cập nhật thông tin sản phẩm
+    description: |
+      Cập nhật thông tin sản phẩm hiện có.  
+      Có thể thay đổi tên, giá, mô tả, tồn kho, isHotDeal hoặc upload ảnh mới.  
+      Ảnh mới upload sẽ được lưu lên Cloudinary và cập nhật vào danh sách ảnh sản phẩm.
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: ID của sản phẩm cần cập nhật
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Áo Hoodie Nữ"
+              price:
+                type: number
+                example: 270000
+              category:
+                type: string
+                example: "Thời trang Nữ"
+              brand:
+                type: string
+                example: "Coolmate Women"
+              stock:
+                type: integer
+                example: 12
+              isHotDeal:
+                type: boolean
+                description: Cập nhật trạng thái Hot Deal
+                example: true
+              description:
+                type: string
+                example: "Phiên bản mới dành cho nữ, chất liệu mềm hơn."
+              tags:
+                type: array
+                items:
+                  type: string
+                example: ["hoodie", "nữ"]
+              images:
+                type: array
+                items:
+                  type: string
+                  format: binary
+                description: Upload ảnh mới (nếu có)
+    responses:
+      "200":
+        description: Cập nhật thành công
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/Product"
+      "404":
+        description: Không tìm thấy sản phẩm
+      "500":
+        description: Lỗi máy chủ
+products/{id}/variants:
+  post:
+    tags: [Product]
+    summary: Thêm biến thể mới cho sản phẩm
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas.yaml#/Variant"
+    responses:
+      "201":
+        description: Thêm biến thể thành công
+
+products/category/{category}:
+  get:
+    tags: [Product]
+    summary: Lọc sản phẩm theo danh mục
+    parameters:
+      - name: category
+        in: path
+        required: true
+        schema: { type: string }
+    responses:
+      "200":
+        description: Thành công
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/ApiResponseProducts"
+
+products/filter:
+  get:
+    tags: [Product]
+    summary: Lọc sản phẩm nâng cao
+    parameters:
+      - name: category
+        in: query
+        schema: { type: string }
+      - name: minPrice
+        in: query
+        schema: { type: number }
+      - name: maxPrice
+        in: query
+        schema: { type: number }
+      - name: brand
+        in: query
+        schema: { type: string }
+      - name: minRating
+        in: query
+        schema: { type: number }
+      - name: isHotDeal
+        in: query
+        schema: { type: boolean }
+    responses:
+      "200":
+        description: Lọc sản phẩm thành công
+        content:
+          application/json:
+            schema:
+              $ref: "../components/schemas.yaml#/ApiResponseProducts"

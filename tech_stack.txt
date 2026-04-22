@@ -1,0 +1,45 @@
+# Project Tech Stack - Uniqlo-Style Application
+
+## Frontend
+- Framework: React 19
+- Build Tool: Vite
+- UI Frameworks/Libraries:
+    - Ant Design (antd)
+    - PrimeReact
+    - Bootstrap & React-Bootstrap
+    - PrimeFlex (Utility-first CSS)
+    - React Icons & Ant Design Icons
+- Data Visualization:
+    - Chart.js & react-chartjs-2
+    - Recharts
+- Navigation: React Router DOM
+- Networking: Axios
+- Real-time: Socket.io-client
+- Utilities:
+    - React Datepicker
+    - JWT Decode
+
+## Backend
+- Runtime: Node.js
+- Framework: Express 5
+- Databases:
+    - MongoDB (via Mongoose)
+    - Redis (Session storage & Socket.io adapter)
+- Authentication:
+    - Passport.js (Local, Google OAuth 2.0, Facebook)
+    - JSON Web Token (JWT)
+    - Express Session
+    - Bcrypt (Password hashing)
+- API Documentation: Swagger (OpenAPI) via swagger-jsdoc & swagger-ui-express
+- Real-time: Socket.io
+- AI Integration: Google Generative AI (@google/genai)
+- File Management:
+    - Multer (Middleware for handling multipart/form-data)
+    - Cloudinary (Cloud-based image and video management)
+- Mailing: Nodemailer
+- Template Engine: EJS
+
+## Infrastructure & DevOps
+- Containerization: Docker & Docker Compose
+- Web Server: Nginx (Frontend deployment)
+- Environment Management: Dotenv

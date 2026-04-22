@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    image: nodejs-web-backend:latest
+    env_file:
+      - ./backend/.env
+    environment:
+      - PORT=3000
+      - MONGO_URI=mongodb://mongo:27017/shopdb
+      - REDIS_URL=redis://redis:6379
+    networks:
+      - app-network
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - mongo
+      - redis
+
+  seed:
+    image: nodejs-web-backend:latest
+    command: npm run seed
+    env_file:
+      - ./backend/.env
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/shopdb
+    networks:
+      - app-network
+    depends_on:
+      - backend
+      - mongo
+
+  frontend:
+    build: ./frontend
+    image: nodejs-web-frontend:latest
+    ports:
+      - "5173:80"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6380:6379"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo_data:

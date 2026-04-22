@@ -1,0 +1,21 @@
+.navbar-links .navbar-brand {
+    color: #333;
+    /* màu mặc định */
+    text-decoration: none;
+    font-weight: 500;
+
+}
+
+.navbar-links .navbar-brand:hover {
+    color: #d10024;
+    /* màu đỏ khi hover */
+
+}
+
+
+
+footer a:hover {
+  color: #d10024 !important;  /* Đổi màu đỏ khi hover */
+  border-bottom: 1px solid #d10024; /* underline nhẹ */
+  text-decoration: none; /* bỏ gạch mặc định */
+}

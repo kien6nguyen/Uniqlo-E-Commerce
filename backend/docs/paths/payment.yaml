@@ -1,0 +1,42 @@
+payment/vnpay/create:
+  post:
+    tags: [Payment]
+    summary: Tạo liên kết thanh toán VNPAY
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [amount, orderId]
+            properties:
+              orderId:
+                type: string
+                example: "ORDER2025_001"
+    responses:
+      "200":
+        description: URL thanh toán được tạo thành công
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                paymentUrl:
+                  type: string
+                  example: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?..."
+
+payment/vnpay_return:
+  get:
+    tags: [Payment]
+    summary: Trang callback sau khi thanh toán xong
+    responses:
+      "302":
+        description: Redirect về trang kết quả thanh toán
+
+payment/vnpay_ipn:
+  get:
+    tags: [Payment]
+    summary: Webhook IPN từ VNPAY (Server-to-Server)
+    responses:
+      "200":
+        description: Xác nhận IPN thành công
