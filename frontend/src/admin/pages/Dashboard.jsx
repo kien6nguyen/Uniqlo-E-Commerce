@@ -43,7 +43,7 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
       const headers = { "Authorization": `Bearer ${token}` };
 
-      const simpleRes = await fetch("http://localhost:3000/api/admin/dashboard/simple", { headers });
+      const simpleRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/admin/dashboard/simple`, { headers });
       const simpleData = await simpleRes.json();
 
       if (simpleData.success) {
@@ -60,7 +60,7 @@ export default function Dashboard() {
          query += `&startDate=${start.toISOString()}&endDate=${end.toISOString()}`;
       }
 
-      const advancedRes = await fetch(`http://localhost:3000/api/admin/dashboard/advanced${query}`, { headers });
+      const advancedRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/admin/dashboard/advanced${query}`, { headers });
       const advancedData = await advancedRes.json();
 
       if (advancedData.success) {

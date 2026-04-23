@@ -13,7 +13,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Password } from 'primereact/password';
 import { InputNumber } from 'primereact/inputnumber';
 
-const API_BASE = "http://localhost:3000/api/admin/users";
+const API_BASE = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/admin/users`;
 const LOCATION_API = "https://provinces.open-api.vn/api";
 
 const UserManagement = () => {
