@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 
-const API_BASE = "http://localhost:3000/api"; // Đảm bảo đúng port server của bạn
+const API_BASE = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api`; // Đảm bảo đúng port server của bạn
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);

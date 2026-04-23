@@ -12,7 +12,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { addOrUpdateCartItem, fetchCart } from "../utils/cartUtils";
 import { io } from "socket.io-client";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3000/api";
+const API_BASE = import.meta.env.VITE_API_BASE || `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api`;
 
 const ProductDetail = () => {
   const toast = useRef(null);
