@@ -41,9 +41,28 @@ const { createClient } = require("redis");
 const { RedisStore } = require("connect-redis");
 const { createAdapter } = require("@socket.io/redis-adapter");
 
-const redisClient = createClient({ url: process.env.REDIS_URL || "redis://127.0.0.1:6379" });
-const pubClient = createClient({ url: process.env.REDIS_URL || "redis://127.0.0.1:6379" });
+const redisConfig = {
+  url: process.env.REDIS_URL || "redis://127.0.0.1:6379",
+  socket: {
+    reconnectStrategy: (retries) => Math.min(retries * 100, 3000),
+    connectTimeout: 10000,
+  }
+};
+
+// Nếu là kết nối Upstash hoặc có rediss:// thì bật TLS
+if (redisConfig.url.startsWith("rediss://")) {
+  redisConfig.socket.tls = true;
+  redisConfig.socket.rejectUnauthorized = false;
+}
+
+const redisClient = createClient(redisConfig);
+const pubClient = createClient(redisConfig);
 const subClient = pubClient.duplicate();
+
+// Error handlers to prevent crashes
+redisClient.on("error", (err) => console.error("Redis Client Error:", err));
+pubClient.on("error", (err) => console.error("Redis Pub Client Error:", err));
+subClient.on("error", (err) => console.error("Redis Sub Client Error:", err));
 
 // Connect to Redis
 (async () => {
@@ -54,7 +73,7 @@ const subClient = pubClient.duplicate();
     await Promise.all([pubClient.connect(), subClient.connect()]);
     console.log("Redis Clients for Socket.io connected");
   } catch (err) {
-    console.error("Redis Connection Error:", err);
+    console.error("Redis Initial Connection Error:", err);
   }
 })();
 
