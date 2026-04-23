@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";

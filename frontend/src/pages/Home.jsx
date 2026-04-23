@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
+import Header from "../components/Header";
 
 const Home = ({ gender: propGender }) => {
     const { gender: paramGender } = useParams();
@@ -102,7 +103,7 @@ const Home = ({ gender: propGender }) => {
                 muted 
                 playsInline 
                 className="absolute top-0 left-0 w-full h-full block"
-                key={v.url} // Force reload video when URL changes
+                key={v.url}
                 style={{ 
                     width: '100vw',
                     height: '100vh',

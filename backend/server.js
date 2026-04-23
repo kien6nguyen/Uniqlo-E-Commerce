@@ -53,7 +53,13 @@ try {
 const redisConfig = {
   url: rawRedisUrl,
   socket: {
-    reconnectStrategy: (retries) => Math.min(retries * 500, 5000),
+    reconnectStrategy: (retries) => {
+      if (retries > 10) {
+        console.error("Redis: Max retries reached, giving up.");
+        return false; // Dừng thử lại
+      }
+      return Math.min(retries * 500, 5000);
+    },
     connectTimeout: 20000,
     keepAlive: 5000,
     rejectUnauthorized: false
