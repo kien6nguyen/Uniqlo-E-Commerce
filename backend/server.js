@@ -55,9 +55,20 @@ const redisConfig = {
   pingInterval: 5000,
 };
 
-const redisClient = createClient(redisConfig);
-const pubClient = createClient(redisConfig);
-const subClient = createClient(redisConfig);
+let redisClient, pubClient, subClient;
+
+try {
+  console.log("--- Redis Diagnostic ---");
+  console.log("URL Protocol:", rawRedisUrl.split(':')[0]);
+  console.log("Using TLS:", rawRedisUrl.startsWith("rediss") ? "Yes" : "No");
+  console.log("------------------------");
+
+  redisClient = createClient(redisConfig);
+  pubClient = createClient(redisConfig);
+  subClient = createClient(redisConfig);
+} catch (initErr) {
+  console.error("Critical Redis Initialization Error:", initErr);
+}
 
 // Error handlers to prevent crashes
 redisClient.on("error", (err) => console.error("Redis Client Error:", err));
