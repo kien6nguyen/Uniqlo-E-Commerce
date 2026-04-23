@@ -15,8 +15,8 @@ import {
   removeDiscountCode
 } from "../utils/cartUtils";
 
-const API_BASE = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/carts`;
-const API_CHECKOUT = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/checkout`;
+const API_BASE = "http://localhost:3000/api/carts";
+const API_CHECKOUT = "http://localhost:3000/api/checkout";
 
 const Cart = () => {
   const navigate = useNavigate();

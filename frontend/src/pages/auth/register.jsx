@@ -310,7 +310,7 @@ function Register() {
                 <button
                   type="button"
                   onClick={() => {
-                    const apiUrl = import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_URL || "http://localhost:3000"}`;
+                    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
                     window.location.href = `${apiUrl}/api/auth/google`;
                   }}
                   className="w-full bg-white text-black border-1 border-black hover:bg-black hover:text-white transition-all py-2 font-bold tracking-widest text-sm flex align-items-center justify-content-center cursor-pointer"

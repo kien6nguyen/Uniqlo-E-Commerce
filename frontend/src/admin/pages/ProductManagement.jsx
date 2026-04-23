@@ -11,7 +11,7 @@ import { Toast } from "primereact/toast";
 import { Chip } from "primereact/chip";
 import { Checkbox } from "primereact/checkbox";
 
-const API_BASE = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/products`;
+const API_BASE = "http://localhost:3000/api/products";
 
 export default function ProductManagement() {
   const [products, setProducts] = useState([]);

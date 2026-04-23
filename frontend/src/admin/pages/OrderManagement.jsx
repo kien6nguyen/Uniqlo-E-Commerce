@@ -11,7 +11,7 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Divider } from "primereact/divider";
 
-const API_BASE = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/admin/orders`;
+const API_BASE = "http://localhost:3000/api/admin/orders";
 
 export default function OrderManagement() {
   // --- STATE ---

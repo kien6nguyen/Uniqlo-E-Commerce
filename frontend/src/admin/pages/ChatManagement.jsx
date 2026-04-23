@@ -11,7 +11,7 @@ const ChatManagement = () => {
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
-        const newSocket = io(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}`, {
+        const newSocket = io('http://localhost:3000', {
             transports: ['websocket'],
             withCredentials: true
         });

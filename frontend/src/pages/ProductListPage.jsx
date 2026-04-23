@@ -13,7 +13,7 @@ import ProductCard from "../components/ProductCard";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-const API_BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/products`;
+const API_BASE_URL = "http://localhost:3000/api/products";
 
 const ProductListPage = () => {
   const location = useLocation();
@@ -191,7 +191,7 @@ const ProductListPage = () => {
   const getImageUrl = (img) => {
       if (!img) return "/img/default.png";
       if (img.startsWith("http")) return img;
-      return `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/${img.replace(/\\/g, "/")}`;
+      return `http://localhost:3000/${img.replace(/\\/g, "/")}`;
   };
 
   // --- RENDER PHẦN ACTIVE FILTERS ---
