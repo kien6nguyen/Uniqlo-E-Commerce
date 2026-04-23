@@ -41,22 +41,23 @@ const { createClient } = require("redis");
 const { RedisStore } = require("connect-redis");
 const { createAdapter } = require("@socket.io/redis-adapter");
 
+const rawRedisUrl = (process.env.REDIS_URL || "redis://127.0.0.1:6379").trim();
+
 const redisConfig = {
-  url: process.env.REDIS_URL || "redis://127.0.0.1:6379",
+  url: rawRedisUrl,
   socket: {
     reconnectStrategy: (retries) => Math.min(retries * 100, 3000),
     connectTimeout: 20000,
     keepAlive: 5000,
-    tls: (process.env.REDIS_URL && process.env.REDIS_URL.startsWith("rediss")) ? {} : undefined,
-    rejectUnauthorized: false,
-    family: 4
+    tls: rawRedisUrl.startsWith("rediss") ? {} : undefined,
+    rejectUnauthorized: false
   },
   pingInterval: 5000,
 };
 
 const redisClient = createClient(redisConfig);
 const pubClient = createClient(redisConfig);
-const subClient = pubClient.duplicate();
+const subClient = createClient(redisConfig);
 
 // Error handlers to prevent crashes
 redisClient.on("error", (err) => console.error("Redis Client Error:", err));
