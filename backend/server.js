@@ -56,7 +56,6 @@ const redisConfig = {
     reconnectStrategy: (retries) => Math.min(retries * 500, 5000),
     connectTimeout: 20000,
     keepAlive: 5000,
-    tls: rawRedisUrl.startsWith("rediss") ? { servername: redisUrlParsed?.hostname } : undefined,
     rejectUnauthorized: false
   },
   pingInterval: 5000,
