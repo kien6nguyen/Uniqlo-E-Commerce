@@ -45,15 +45,14 @@ const redisConfig = {
   url: process.env.REDIS_URL || "redis://127.0.0.1:6379",
   socket: {
     reconnectStrategy: (retries) => Math.min(retries * 100, 3000),
-    connectTimeout: 10000,
-  }
+    connectTimeout: 20000,
+    keepAlive: 5000,
+    tls: (process.env.REDIS_URL && process.env.REDIS_URL.startsWith("rediss")) ? {} : undefined,
+    rejectUnauthorized: false,
+    family: 4
+  },
+  pingInterval: 5000,
 };
-
-// Nếu là kết nối Upstash hoặc có rediss:// thì bật TLS
-if (redisConfig.url.startsWith("rediss://")) {
-  redisConfig.socket.tls = true;
-  redisConfig.socket.rejectUnauthorized = false;
-}
 
 const redisClient = createClient(redisConfig);
 const pubClient = createClient(redisConfig);
