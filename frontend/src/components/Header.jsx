@@ -105,7 +105,7 @@ function Header() {
   );
 
   const segmentsData = {
-    nu: {
+    woman: {
       label: "NỮ",
       searchPlaceholder: "Tìm kiếm sản phẩm",
       categories: [
@@ -157,7 +157,7 @@ function Header() {
         { title: "Jeans", desc: "Chắc chắn", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-jeans.jpg" },
       ]
     },
-    "kid": {
+    "kids": {
       label: "TRẺ EM",
       searchPlaceholder: "Tìm kiếm sản phẩm trẻ em",
       categories: Array(20).fill({ title: "Đồ Trẻ Em", desc: "Chất lượng an toàn", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids.jpg" })
