@@ -26,6 +26,7 @@ const socialRoutes = require("./src/routes/socialRoutes");
 const Product = require("./src/models/Product");
 const runSeed = require("./src/seed/runSeed");
 
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -281,7 +282,6 @@ server.listen(PORT, () => {
   console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
 
   // Run auto-seed in background after server is up
-  // This prevents Render from timing out during deployment
   setTimeout(async () => {
     try {
       const productCount = await Product.countDocuments();
