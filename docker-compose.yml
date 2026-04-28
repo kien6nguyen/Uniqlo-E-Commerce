@@ -15,7 +15,7 @@ services:
     ports:
       - "3000:3000"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -39,12 +39,14 @@ services:
   frontend:
     build: ./frontend
     image: nodejs-web-frontend:latest
+    restart: always
     ports:
       - "5173:80"
     networks:
       - app-network
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
   mongo:
     image: mongo:latest

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Button } from "primereact/button";
 import { ProgressSpinner } from "primereact/progressspinner";
@@ -28,7 +27,7 @@ const PaymentSuccess = () => {
 
   return (
     <>
-      <Header />
+
       <div className="flex align-items-center justify-content-center" style={{ minHeight: "60vh", background: "#f9fafb" }}>
         <div className="surface-card p-6 shadow-2 border-round-lg text-center" style={{ maxWidth: "500px" }}>
           <div className="mb-4">
@@ -93,7 +92,7 @@ const PaymentFailed = () => {
 
   return (
     <>
-      <Header />
+
       <div className="flex align-items-center justify-content-center" style={{ minHeight: "60vh", background: "#f9fafb" }}>
         <div className="surface-card p-6 shadow-2 border-round-lg text-center" style={{ maxWidth: "500px" }}>
           <div className="mb-4">

@@ -5,12 +5,13 @@ import { Badge } from "primereact/badge";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { fetchCart } from "../utils/cartUtils";
 
-function Header() {
+function Header({ forceLightMode = false }) {
   const navigate = useNavigate();
   const location = useLocation();
   const pathname = location.pathname;
+  const urlParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   // Các trang sử dụng giao diện video slider
-  const videoPaths = ["/", "/woman", "/man", "/kids", "/baby"];
+  const videoPaths = ["/", "/woman", "/man", "/kid", "/baby"];
   const isVideoPage = videoPaths.includes(pathname);
   const isHome = isVideoPage;
   const [user, setUser] = useState(null);
@@ -24,6 +25,15 @@ function Header() {
   const [selectedGender, setSelectedGender] = useState("woman");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
+
+  // Sync selectedGender with current path
+  useEffect(() => {
+    const pathKey = pathname === "/" ? "woman" : pathname.replace("/", "");
+    if (["woman", "man", "kid", "baby"].includes(pathKey)) {
+      setSelectedGender(pathKey);
+    }
+  }, [pathname]);
+
 
   const processWishlistData = (wishlistData) => {
     if (wishlistData && Array.isArray(wishlistData)) {
@@ -47,7 +57,7 @@ function Header() {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/user/me`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/user/me`, {
           headers: { "Authorization": `Bearer ${token}` }
         });
         const data = await res.json();
@@ -87,22 +97,60 @@ function Header() {
     };
   }, []);
 
-  const handleSearch = () => {
-    if (keyword.trim()) {
-      navigate(`/search?q=${encodeURIComponent(keyword)}`);
+  const handleSearch = (query) => {
+    const searchTerm = (typeof query === 'string' ? query : keyword).trim();
+    if (searchTerm) {
+      navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
       searchPanel.current?.hide();
+      setKeyword(searchTerm);
     }
   };
 
+  const handleRemoveFromWishlist = async (e, productId) => {
+    e.stopPropagation();
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/user/me/wishlist`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ productId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.dispatchEvent(new CustomEvent("wishlistUpdated"));
+      }
+    } catch (err) {
+      console.error("Error removing from wishlist:", err);
+    }
+  };
+
+  const handleRemoveFromCart = async (e, productId, variantId, color) => {
+    e.stopPropagation();
+    try {
+      const { removeCartItem } = await import("../utils/cartUtils");
+      await removeCartItem(productId, variantId, color);
+      // Event cartUpdated will be emitted by removeCartItem
+    } catch (err) {
+      console.error("Error removing from cart:", err);
+    }
+  };
+
+
   const menuItems = useMemo(
     () => [
-      { label: "NỮ", path: "/" },
-      { label: "NAM", path: "/man" },
-      { label: "TRẺ EM", path: "/kids" },
-      { label: "EM BÉ", path: "/baby" },
+      { label: "NỮ", gender: "woman" },
+      { label: "NAM", gender: "man" },
+      { label: "TRẺ EM", gender: "kid" },
+      { label: "EM BÉ", gender: "baby" },
     ],
     []
   );
+
 
   const segmentsData = {
     woman: {
@@ -157,7 +205,7 @@ function Header() {
         { title: "Jeans", desc: "Chắc chắn", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-jeans.jpg" },
       ]
     },
-    "kids": {
+    "kid": {
       label: "TRẺ EM",
       searchPlaceholder: "Tìm kiếm sản phẩm trẻ em",
       categories: Array(20).fill({ title: "Đồ Trẻ Em", desc: "Chất lượng an toàn", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids.jpg" })
@@ -188,7 +236,7 @@ function Header() {
       className={`${isHome ? "absolute" : "sticky"} top-0 left-0 w-full`}
       style={{
         borderBottom: 'none',
-        backgroundColor: isHome && !isMenuOpen ? 'transparent' : 'white',
+        backgroundColor: isHome && !isMenuOpen && !forceLightMode ? 'transparent' : 'white',
         zIndex: 3000,
         transition: 'all 0.3s ease',
         height: '90px'
@@ -208,33 +256,29 @@ function Header() {
         <nav className="flex-2 hidden lg:block z-5">
           <ul className="flex list-none p-0 m-0 gap-5 justify-content-center">
             {menuItems.map((it) => {
-              const pathKey = it.path.replace("/", "");
-              // Ánh xạ / sang woman, các path khác giữ nguyên
-              const genderKey = pathKey === "" ? "woman" : pathKey;
-              
-              const active = pathname === it.path;
+              const isActive = selectedGender === it.gender && isMenuOpen;
+              const isRouteActive = urlParams.get("gender") === it.gender;
 
               return (
-                <li key={it.path}>
-                  <Link
-                    to={it.path}
+                <li key={it.gender}>
+                  <button
                     onClick={() => {
-                      if (isMenuOpen && selectedGender === genderKey) {
-                        setIsMenuOpen(false);
+                      if (selectedGender === it.gender) {
+                        setIsMenuOpen(!isMenuOpen);
                       } else {
-                        setSelectedGender(genderKey);
+                        setSelectedGender(it.gender);
                         setIsMenuOpen(true);
                       }
                     }}
-                    className={`no-underline font-light text-lg uppercase transition-all py-2 px-1 relative ${isHome && !isMenuOpen ? "text-white" : "text-900"
-                      } ${active ? "opacity-100" : "opacity-60 hover:opacity-100"}`}
+                    className={`bg-transparent border-none no-underline font-light text-lg uppercase transition-all py-2 px-1 relative cursor-pointer ${isHome && !isMenuOpen && !forceLightMode ? "text-white" : "text-900"
+                      } ${isActive || isRouteActive ? "opacity-100" : "opacity-60 hover:opacity-100"}`}
                     style={{
-                      textShadow: isHome && !isMenuOpen ? '0 1px 3px rgba(0,0,0,0.5)' : 'none',
-                      borderBottom: active ? (isHome && !isMenuOpen ? '2px solid white' : '2px solid black') : '2px solid transparent'
+                      textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none',
+                      borderBottom: (isActive || isRouteActive) ? (isHome && !isMenuOpen && !forceLightMode ? '2px solid white' : '2px solid black') : '2px solid transparent'
                     }}
                   >
                     {it.label}
-                  </Link>
+                  </button>
                 </li>
               );
             })}
@@ -242,36 +286,51 @@ function Header() {
         </nav>
 
         {/* RIGHT: ICONS */}
-        <div className={`flex-1 flex justify-content-end align-items-center gap-4 ${isHome && !isMenuOpen ? "text-white" : "text-900"}`}>
+        <div className={`flex-1 flex justify-content-end align-items-center gap-4 ${isHome && !isMenuOpen && !forceLightMode ? "text-white" : "text-900"}`}>
 
           {/* 1. Search Icon */}
           <div className="cursor-pointer" onClick={(e) => searchPanel.current?.toggle(e)}>
-            <i className="pi pi-search text-xl" style={{ textShadow: isHome && !isMenuOpen ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
+            <i className="pi pi-search text-xl" style={{ textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
           </div>
 
           {/* 2. Wishlist Icon */}
           <div className="cursor-pointer relative" onClick={(e) => wishlistPanel.current?.toggle(e)}>
-            <i className="pi pi-heart text-xl" style={{ textShadow: isHome && !isMenuOpen ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
+            <i className="pi pi-heart text-xl" style={{ textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
             {wishlist.length > 0 && <Badge value={wishlist.length} severity="danger" className="absolute -top-2 -right-2" />}
           </div>
 
           {/* 3. Profile Icon */}
           {user ? (
             <div className="relative group cursor-pointer flex align-items-center gap-2" onClick={() => navigate("/profile")}>
-              <i className="pi pi-user text-xl" style={{ textShadow: isHome && !isMenuOpen ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
-              <span className="text-xs font-normal hidden md:block uppercase" style={{ textShadow: isHome && !isMenuOpen ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}>{user.fullname?.split(' ')[0]}</span>
+              <i className="pi pi-user text-xl" style={{ textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
+              <span className="text-xs font-normal hidden md:block uppercase" style={{ textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}>{user.fullname?.split(' ')[0]}</span>
             </div>
           ) : (
             <Link to="/login" className="no-underline flex align-items-center" style={{ color: 'inherit' }}>
-              <i className="pi pi-user text-xl" style={{ textShadow: isHome && !isMenuOpen ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
+              <i className="pi pi-user text-xl" style={{ textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
             </Link>
           )}
 
           {/* 4. Cart Icon */}
-          <div className="cursor-pointer relative" onClick={(e) => cartPanel.current?.toggle(e)}>
-            <i className="pi pi-shopping-cart text-xl" style={{ textShadow: isHome && !isMenuOpen ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
-            {totalCartCount > 0 && <Badge value={totalCartCount} severity="danger" className="absolute -top-2 -right-2" />}
+          <div className="cursor-pointer relative p-2" onClick={(e) => cartPanel.current?.toggle(e)}>
+            <i className="pi pi-shopping-cart text-xl" style={{ textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
+            {totalCartCount > 0 && (
+              <span className={`absolute border-circle flex align-items-center justify-content-center font-bold transition-all shadow-1 ${isHome && !isMenuOpen && !forceLightMode ? 'bg-white text-900' : 'bg-900 text-white'}`}
+                style={{ 
+                  top: '0', 
+                  right: '0', 
+                  width: '14px', 
+                  height: '14px', 
+                  fontSize: '8px',
+                  lineHeight: '1',
+                  zIndex: 10,
+                  border: isHome && !isMenuOpen && !forceLightMode ? '1px solid white' : '1px solid black'
+                }}>
+                {totalCartCount}
+              </span>
+            )}
           </div>
+
         </div>
       </div>
 
@@ -323,10 +382,10 @@ function Header() {
             <div className="px-4 mt-4 flex gap-4">
               <span className="text-xs text-500 uppercase font-bold">Gợi ý:</span>
               <div className="flex gap-3 text-xs uppercase text-700 font-medium">
-                <span className="cursor-pointer hover:underline" onClick={() => { setKeyword("Áo thun"); handleSearch(); }}>Áo thun</span>
-                <span className="cursor-pointer hover:underline" onClick={() => { setKeyword("Jeans"); handleSearch(); }}>Jeans</span>
-                <span className="cursor-pointer hover:underline" onClick={() => { setKeyword("Heattech"); handleSearch(); }}>Heattech</span>
-                <span className="cursor-pointer hover:underline" onClick={() => { setKeyword("Airism"); handleSearch(); }}>Airism</span>
+                <span className="cursor-pointer hover:underline" onClick={() => handleSearch("Áo thun")}>Áo thun</span>
+                <span className="cursor-pointer hover:underline" onClick={() => handleSearch("Jeans")}>Jeans</span>
+                <span className="cursor-pointer hover:underline" onClick={() => handleSearch("Heattech")}>Heattech</span>
+                <span className="cursor-pointer hover:underline" onClick={() => handleSearch("Airism")}>Airism</span>
               </div>
             </div>
           </div>
@@ -334,75 +393,121 @@ function Header() {
       </OverlayPanel>
 
       {/* WISHLIST OVERLAY */}
-      <OverlayPanel ref={wishlistPanel} dismissable>
-        <div className="w-20rem p-0">
-          <h4 className="p-3 m-0 border-bottom-1 border-100 font-bold uppercase text-xs">Wishlist ({wishlist.length})</h4>
-          <div className="max-h-20rem overflow-y-auto">
+      <OverlayPanel ref={wishlistPanel} dismissable style={{ width: '320px', borderRadius: '0', border: '1px solid #eee' }}>
+        <div className="p-0">
+          <div className="p-3 border-bottom-1 border-100 flex justify-content-between align-items-center">
+            <h4 className="m-0 font-bold uppercase text-xs tracking-wider">Danh sách yêu thích ({wishlist.length})</h4>
+            <Link to="/wishlist" className="text-xs font-bold text-blue-600 no-underline hover:underline" onClick={() => wishlistPanel.current?.hide()}>Xem tất cả</Link>
+          </div>
+          <div className="max-h-24rem overflow-y-auto">
             {wishlist.length === 0 ? (
-              <p className="p-4 text-center text-500 m-0 text-xs uppercase">No items in wishlist</p>
+              <div className="p-5 text-center flex flex-column align-items-center gap-2">
+                <i className="pi pi-heart text-200 text-4xl"></i>
+                <p className="text-500 m-0 text-xs uppercase tracking-tight">Chưa có sản phẩm nào</p>
+              </div>
             ) : (
               wishlist.map((p) => (
-                <div key={p.id} className="flex gap-3 p-3 hover:bg-gray-100 cursor-pointer" onClick={() => navigate(`/products/${p.id}`)}>
-                  <img src={p.img} alt={p.name} style={{ width: 60, height: 60, objectFit: 'cover' }} />
-                  <div className="flex flex-column justify-content-center">
-                    <span className="font-bold text-xs uppercase">{p.name}</span>
-                    <span className="text-red-600 font-bold text-xs">{(p.price || 0).toLocaleString("vi-VN")}₫</span>
+                <div key={p.id} className="flex gap-3 p-3 border-bottom-1 border-50 hover:bg-gray-50 transition-all group relative cursor-pointer" onClick={() => { navigate(`/products/${p.id}`); wishlistPanel.current?.hide(); }}>
+                  <div className="w-4rem h-4rem flex-shrink-0 overflow-hidden border-round-sm border-1 border-50">
+                    <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
                   </div>
+                  <div className="flex flex-column justify-content-between flex-1 min-w-0">
+                    <div className="pr-4">
+                      <span className="font-bold text-xs uppercase block text-overflow-ellipsis overflow-hidden white-space-nowrap">{p.name}</span>
+                      <span className="text-500 text-xs block mt-1">{p.brand}</span>
+                    </div>
+                    <span className="text-900 font-bold text-sm">{(p.price || 0).toLocaleString("vi-VN")}₫</span>
+                  </div>
+                  <button
+                    className="absolute top-0 right-0 p-3 text-300 hover:text-red-500 transition-colors border-none bg-transparent cursor-pointer opacity-0 group-hover:opacity-100"
+                    onClick={(e) => handleRemoveFromWishlist(e, p.id)}
+                  >
+                    <i className="pi pi-trash text-sm"></i>
+                  </button>
                 </div>
               ))
             )}
           </div>
-          {wishlist.length > 0 && <div className="p-3"><button className="w-full text-xs font-bold uppercase bg-black text-white py-2 border-none cursor-pointer" onClick={() => navigate("/wishlist")}>View Wishlist</button></div>}
         </div>
       </OverlayPanel>
 
+
       {/* CART OVERLAY */}
-      <OverlayPanel ref={cartPanel} dismissable>
-        <div className="w-20rem p-0">
-          <h4 className="p-3 m-0 border-bottom-1 border-100 font-bold uppercase text-xs">Shopping Cart ({totalCartCount})</h4>
-          <div className="max-h-20rem overflow-y-auto">
+      <OverlayPanel ref={cartPanel} dismissable style={{ width: '350px', borderRadius: '0', border: '1px solid #eee' }}>
+        <div className="p-0">
+          <div className="p-3 border-bottom-1 border-100 flex justify-content-between align-items-center">
+            <h4 className="m-0 font-bold uppercase text-xs tracking-wider">Giỏ hàng ({totalCartCount})</h4>
+            <Link to="/cart" className="text-xs font-bold text-blue-600 no-underline hover:underline" onClick={() => cartPanel.current?.hide()}>Chi tiết giỏ hàng</Link>
+          </div>
+          <div className="max-h-24rem overflow-y-auto">
             {cartItems.length === 0 ? (
-              <p className="p-4 text-center text-500 m-0 text-xs uppercase">Your cart is empty</p>
+              <div className="p-5 text-center flex flex-column align-items-center gap-2">
+                <i className="pi pi-shopping-cart text-200 text-4xl"></i>
+                <p className="text-500 m-0 text-xs uppercase tracking-tight">Giỏ hàng trống</p>
+              </div>
             ) : (
               cartItems.map((item) => {
                 const product = item.product;
                 if (!product) return null;
                 const productId = product._id || product.id || product;
+                const variantName = item.variantName || (product.variants?.find(v => v._id === item.variantId)?.name);
+
                 return (
-                  <div key={item._id || productId} className="flex gap-3 p-3 hover:bg-gray-100 cursor-pointer" onClick={() => navigate(`/products/${productId}`)}>
-                    <img src={product.images?.[0] || "/img/default.png"} alt={product.name} style={{ width: 60, height: 60, objectFit: 'cover' }} />
-                    <div className="flex flex-column justify-content-center flex-1">
-                      <span className="font-bold text-xs uppercase text-overflow-ellipsis overflow-hidden">{product.name}</span>
-                      <div className="flex justify-content-between mt-1 text-xs">
-                        <span>QTY: {item.quantity}</span>
-                        <span className="text-red-600 font-bold">{(item.price || product.price || 0).toLocaleString("vi-VN")}₫</span>
+                  <div key={item._id || productId} className="flex gap-3 p-3 border-bottom-1 border-50 hover:bg-gray-50 transition-all group relative cursor-pointer" onClick={() => { navigate(`/products/${productId}`); cartPanel.current?.hide(); }}>
+                    <div className="w-4rem h-5rem flex-shrink-0 overflow-hidden border-round-sm border-1 border-50">
+                      <img src={product.images?.[0] || "/img/default.png"} alt={product.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex flex-column justify-content-between flex-1 min-w-0">
+                      <div>
+                        <span className="font-bold text-xs uppercase block text-overflow-ellipsis overflow-hidden white-space-nowrap pr-4">{product.name}</span>
+                        <div className="flex gap-2 mt-1 text-xs text-500">
+                          {variantName && <span>Size: {variantName}</span>}
+                          {item.color && <span>Màu: {item.color}</span>}
+                        </div>
+                      </div>
+                      <div className="flex justify-content-between align-items-center mt-2">
+                        <span className="text-xs font-medium text-600">Số lượng: {item.quantity}</span>
+                        <span className="text-900 font-bold text-sm">{(item.price || product.price || 0).toLocaleString("vi-VN")}₫</span>
                       </div>
                     </div>
+                    <button
+                      className="absolute top-0 right-0 p-3 text-300 hover:text-red-500 transition-colors border-none bg-transparent cursor-pointer opacity-0 group-hover:opacity-100"
+                      onClick={(e) => handleRemoveFromCart(e, productId, item.variantId, item.color)}
+                    >
+                      <i className="pi pi-trash text-sm"></i>
+                    </button>
                   </div>
                 );
               })
             )}
           </div>
           {cartItems.length > 0 && (
-            <div className="p-3 bg-gray-50 border-top-1 border-100">
-              <div className="flex justify-content-between mb-3 font-bold uppercase text-xs">
-                <span>Subtotal:</span>
-                <span className="text-red-600">{totalCartPrice.toLocaleString("vi-VN")}₫</span>
+            <div className="p-3 bg-gray-50">
+              <div className="flex justify-content-between mb-3">
+                <span className="text-xs font-bold uppercase text-600">Tổng cộng:</span>
+                <span className="text-900 font-bold text-lg">{totalCartPrice.toLocaleString("vi-VN")}₫</span>
               </div>
-              <button className="w-full bg-black text-white py-2 font-bold uppercase border-none cursor-pointer" onClick={() => navigate("/cart")}>Checkout</button>
+              <button
+                className="w-full bg-black text-white py-3 font-bold uppercase border-none cursor-pointer hover:bg-gray-800 transition-all text-sm tracking-widest"
+                onClick={() => { navigate("/checkout"); cartPanel.current?.hide(); }}
+              >
+                Thanh toán
+              </button>
             </div>
           )}
         </div>
       </OverlayPanel>
+
       {/* CUSTOM MEGA MENU */}
       <div
         ref={menuRef}
-        className={`fixed left-0 w-full bg-white shadow-8 overflow-hidden transition-all duration-500 ease-in-out ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed left-0 w-full bg-white shadow-8 overflow-hidden transition-all duration-800 ease-in-out ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         style={{
           top: '90px',
           zIndex: 1000,
           maxHeight: isMenuOpen ? '65vh' : '0',
-          transform: isMenuOpen ? 'translateY(0)' : 'translateY(-10px)'
+          transform: isMenuOpen ? 'translateY(0)' : 'translateY(-10px)',
+          transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
         }}
       >
         <div className="bg-white relative flex flex-column" style={{ maxHeight: '65vh' }}>
@@ -422,7 +527,7 @@ function Header() {
                 style={{ letterSpacing: '1px' }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    navigate(`/gender/${selectedGender}?q=${encodeURIComponent(e.target.value)}`);
+                    navigate(`/search?gender=${selectedGender}&q=${encodeURIComponent(e.target.value)}`);
                     setIsMenuOpen(false);
                   }
                 }}
@@ -430,9 +535,9 @@ function Header() {
             </div>
             <div className="flex gap-3 mt-3">
               <span className="text-xs text-500 uppercase">Tìm kiếm phổ biến:</span>
-              <span className="text-xs font-bold cursor-pointer hover:text-red-600">Áo Polo</span>
-              <span className="text-xs font-bold cursor-pointer hover:text-red-600">Quần Smart Pants</span>
-              <span className="text-xs font-bold cursor-pointer hover:text-red-600">Đồ lót Airism</span>
+              <span className="text-xs font-bold cursor-pointer hover:text-red-600" onClick={() => handleSearch("Áo Polo")}>Áo Polo</span>
+              <span className="text-xs font-bold cursor-pointer hover:text-red-600" onClick={() => handleSearch("Quần Smart Pants")}>Quần Smart Pants</span>
+              <span className="text-xs font-bold cursor-pointer hover:text-red-600" onClick={() => handleSearch("Đồ lót Airism")}>Đồ lót Airism</span>
             </div>
           </div>
 
@@ -440,7 +545,7 @@ function Header() {
             <div className="grid m-0">
               {segmentsData[selectedGender]?.categories.map((cat, idx) => (
                 <div key={idx} className="col-3 p-3 hover:bg-gray-100 cursor-pointer transition-colors border-round" onClick={() => {
-                  navigate(`/gender/${selectedGender}?sub=${cat.title}`);
+                  navigate(`/search?gender=${selectedGender}&sub=${encodeURIComponent(cat.title)}`);
                   setIsMenuOpen(false);
                 }}>
                   <div className="flex align-items-center gap-3">

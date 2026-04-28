@@ -67,12 +67,17 @@ exports.getProduct = async (req, res) => {
                 name: product.name,
                 price: product.price,
                 description: product.description,
+                gender: product.gender,
                 category: product.category,
+                productLine: product.productLine,
+                brand: product.brand,
+                tags: product.tags,
                 stock: product.stock,
                 images: product.images,
                 averageRating: product.averageRating,
-                isHotDeal: product.isHotDeal, 
-                variants: product.variants, 
+                isHotDeal: product.isHotDeal,
+                isNewProduct: product.isNewProduct,
+                variants: product.variants,
                 createdAt: product.createdAt,
                 updatedAt: product.updatedAt
             }
@@ -255,6 +260,8 @@ exports.deleteVariant = async (req, res) => {
 exports.filterProduct = async (req, res) => {
   try {
     const { 
+      gender,
+      productLine,
       category, 
       brand, 
       tags,
@@ -273,44 +280,74 @@ exports.filterProduct = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const filter = {};
+
+    // 1. Lọc theo giới tính (ưu tiên đầu tiên)
+    if (gender && gender !== "all") {
+      const genderList = gender.split(',').map(g => g.trim().toLowerCase());
+      filter.gender = genderList.length === 1 ? genderList[0] : { $in: genderList };
+    }
+
+    // 2. Lọc theo dòng sản phẩm (ưu tiên thứ hai)
+    if (productLine && productLine !== "All") {
+      const lineList = productLine.split(',').map(l => l.trim());
+      filter.productLine = lineList.length === 1 ? lineList[0] : { $in: lineList };
+    }
+
+    // 3. Lọc theo danh mục
     if (category && category !== "All") filter.category = category;
+
+    // 4. Thương hiệu
     if (brand) {
-        const brandList = brand.split(',');
-        if (brandList.length > 0) {
-            filter.brand = { $in: brandList };
-        }
+      const brandList = brand.split(',').map(b => b.trim());
+      if (brandList.length > 0) filter.brand = { $in: brandList };
     }
+
+    // 5. Tags
     if (tags) {
-        const tagList = tags.split(',');
-        if (tagList.length > 0) {
-            filter.tags = { $in: tagList }; 
-        }
-    }
-    if (category) filter.category = category;
-    
-    if (isHotDeal !== undefined) {
-        filter.isHotDeal = isHotDeal === 'true';
-    }
-    if (isNewProduct !== undefined) {
-        filter.isNewProduct = isNewProduct === 'true';
+      const tagList = tags.split(',').map(t => t.trim());
+      if (tagList.length > 0) filter.tags = { $in: tagList };
     }
 
+    // 6. Deals & New
+    if (isHotDeal !== undefined) filter.isHotDeal = isHotDeal === 'true';
+    if (isNewProduct !== undefined) filter.isNewProduct = isNewProduct === 'true';
+
+    // 7. Tìm kiếm text (Ưu tiên tên sản phẩm và tags để tăng độ chính xác)
     if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
-        { sku: { $regex: search, $options: "i" } }
-      ];
+      const searchStr = (Array.isArray(search) ? search.join(' ') : search).trim();
+      const searchTerms = searchStr.split(/\s+/).filter(t => t.length > 0);
+      
+      // Tạo regex cho từng từ để tìm kiếm linh hoạt hơn
+      const regexArr = searchTerms.map(t => new RegExp(t, "i"));
+      
+      filter.$and = filter.$and || [];
+      filter.$and.push({
+        $or: [
+          // Tìm chính xác cả cụm
+          { name: { $regex: searchStr, $options: "i" } },
+          // Hoặc khớp tất cả các từ trong tên
+          { $and: searchTerms.map(t => ({ name: { $regex: t, $options: "i" } })) },
+          // Hoặc khớp bất kỳ từ nào trong tags
+          { tags: { $in: regexArr } },
+          { sku: { $regex: searchStr, $options: "i" } }
+        ]
+      });
     }
+    // Nếu vẫn muốn tìm trong description nhưng độ ưu tiên thấp hơn, 
+    // ta có thể giữ lại hoặc loại bỏ tùy nhu cầu chính xác.
+    // Ở đây tôi loại bỏ description để tránh "quần jean" hiện khi tìm "áo thun".
 
+    // 8. Khoảng giá
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = Number(minPrice);
       if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
 
+    // 9. Rating tối thiểu
     if (minRating) filter.averageRating = { $gte: Number(minRating) };
 
+    // 10. Còn hàng
     if (inStock === "true") filter.stock = { $gt: 0 };
 
     const sortOption = {};
@@ -322,7 +359,7 @@ exports.filterProduct = async (req, res) => {
       case "newest": sortOption.createdAt = -1; break;
       case "oldest": sortOption.createdAt = 1; break;
       case "rating_desc": sortOption.averageRating = -1; break;
-      default: sortOption.createdAt = -1; 
+      default: sortOption.createdAt = -1;
     }
 
     const [products, total] = await Promise.all([
@@ -336,7 +373,7 @@ exports.filterProduct = async (req, res) => {
       limit,
       total,
       totalPages: Math.max(1, Math.ceil(total / limit)),
-      products 
+      products
     });
 
   } catch (err) {
@@ -345,24 +382,42 @@ exports.filterProduct = async (req, res) => {
 };
 exports.getFilterAttributes = async (req, res) => {
   try {
-    const [brands, tags, priceStats] = await Promise.all([
-      Product.distinct("brand"),
-      Product.distinct("tags"),
+    const { gender } = req.query;
+    // Nếu có gender, lọc attributes theo gender đó
+    const matchStage = gender && gender !== 'all' ? { $match: { gender } } : null;
+
+    const pipeline = (field) => [
+      ...(matchStage ? [matchStage] : []),
+      { $unwind: `$${field}` },
+      { $group: { _id: `$${field}` } },
+      { $sort: { _id: 1 } }
+    ];
+
+    const [brandsRaw, tagsRaw, productLinesRaw, priceStats, categories] = await Promise.all([
+      Product.aggregate(pipeline("brand")),
+      Product.aggregate(pipeline("tags")),
       Product.aggregate([
-        { 
-          $group: { 
-            _id: null, 
-            maxPrice: { $max: "$price" },
-            minPrice: { $min: "$price" }
-          } 
-        }
+        ...(matchStage ? [matchStage] : []),
+        { $group: { _id: "$productLine" } },
+        { $sort: { _id: 1 } }
+      ]),
+      Product.aggregate([
+        ...(matchStage ? [matchStage] : []),
+        { $group: { _id: null, maxPrice: { $max: "$price" }, minPrice: { $min: "$price" } } }
+      ]),
+      Product.aggregate([
+        ...(matchStage ? [matchStage] : []),
+        { $group: { _id: "$category" } },
+        { $sort: { _id: 1 } }
       ])
     ]);
 
     res.json({
       success: true,
-      brands: brands.filter(b => b), 
-      tags: tags.filter(t => t),
+      brands: brandsRaw.map(b => b._id).filter(Boolean),
+      tags: tagsRaw.map(t => t._id).filter(Boolean),
+      productLines: productLinesRaw.map(p => p._id).filter(Boolean),
+      categories: categories.map(c => c._id).filter(Boolean),
       priceRange: {
         min: priceStats[0]?.minPrice || 0,
         max: priceStats[0]?.maxPrice || 50000000

@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
@@ -302,7 +301,6 @@ const Cart = () => {
   if (loading) {
     return (
       <>
-        <Header />
         <div className="p-5 text-center">Đang tải giỏ hàng...</div>
         <Footer />
       </>
@@ -312,7 +310,7 @@ const Cart = () => {
   return (
     <>
       <Toast ref={toast} />
-      <Header />
+
       <div className="p-5 bg-gray-50 flex justify-content-center">
         <div
           style={{
@@ -405,7 +403,7 @@ const Cart = () => {
                       </div>
                       <div className="flex flex-column flex-1">
                         {/* Tên sản phẩm có Link */}
-                        <Link to={`/api/products/${product._id || product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <Link to={`/product/${product._id || product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                             <span className="font-medium hover:text-primary cursor-pointer transition-colors transition-duration-200">
                                 {productName}
                             </span>

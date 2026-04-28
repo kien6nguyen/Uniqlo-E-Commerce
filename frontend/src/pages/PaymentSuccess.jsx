@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "primereact/button";
 import { ProgressSpinner } from "primereact/progressspinner";
-import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 const API_BASE = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api`;
@@ -77,7 +76,7 @@ const PaymentSuccess = () => {
   if (loading) {
     return (
       <>
-        <Header />
+
         <div className="flex flex-column align-items-center justify-content-center" style={{ minHeight: "60vh" }}>
           <ProgressSpinner />
           <p className="mt-3 text-600">Đang xác nhận thanh toán...</p>
@@ -89,7 +88,7 @@ const PaymentSuccess = () => {
 
   return (
     <>
-      <Header />
+
       <div className="flex flex-column align-items-center justify-content-center p-5" style={{ minHeight: "60vh", backgroundColor: "#f9fafb" }}>
         <div className="surface-card border-round-lg shadow-2 p-5 text-center" style={{ maxWidth: "600px", width: "100%" }}>
           {/* Icon thành công */}

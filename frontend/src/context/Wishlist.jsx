@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
@@ -112,8 +111,8 @@ const Wishlist = () => {
 
   return (
     <>
-      <Header />
       <Toast ref={toast} />
+
       <div className="p-4" style={{ maxWidth: "900px", margin: "0 auto", minHeight: "60vh" }}>
         <h2 className="mb-4 text-2xl font-bold border-bottom-1 border-300 pb-3">
             Sản phẩm yêu thích ({wishlist.length})

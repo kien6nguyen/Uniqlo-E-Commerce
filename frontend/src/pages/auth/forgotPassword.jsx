@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import api from "../../utils/axiosInstance";
 import { useNavigate, Link } from "react-router-dom";
@@ -52,7 +51,7 @@ function ForgotPassword() {
 
   return (
     <div className="min-h-screen flex flex-column bg-white">
-      <Header />
+
       
       <main className="flex-grow flex align-items-center justify-content-center py-8 px-4">
         <div className="w-full max-w-24rem">

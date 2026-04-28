@@ -4,7 +4,6 @@ import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { Dialog } from "primereact/dialog";
 import { RadioButton } from "primereact/radiobutton";
-import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 const AddressPage = () => {
@@ -144,7 +143,7 @@ const AddressPage = () => {
 
   return (
     <>
-      <Header />
+
       <div className="p-5 bg-gray-50 flex justify-content-center">
         <div
           className="surface-card border-round-lg shadow-2 p-5"

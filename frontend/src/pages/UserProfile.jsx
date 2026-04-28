@@ -9,7 +9,6 @@ import { Badge } from "primereact/badge";
 import { Dropdown } from "primereact/dropdown";
 import { Tag } from "primereact/tag";
 import { useNavigate } from "react-router-dom"; // Thêm để logout nếu cần
-import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 // Cấu hình API
@@ -397,7 +396,7 @@ const UserProfile = () => {
 
     return (
         <div style={{ backgroundColor: "#f3f4f6", minHeight: "100vh", fontFamily: 'Inter, sans-serif', color: '#374151' }}>
-            <Header />
+
             <Toast ref={toast} />
 
             <div className="p-4 md:p-6" style={{ maxWidth: "1100px", margin: "0 auto" }}>

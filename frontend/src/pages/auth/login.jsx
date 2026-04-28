@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { Link, useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
@@ -82,7 +81,7 @@ function Login() {
 
   return (
     <div className="min-h-screen flex flex-column bg-white">
-      <Header />
+
       
       <main className="flex-grow flex align-items-center justify-content-center py-8 px-4">
         <div className="w-full max-w-24rem">

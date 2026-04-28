@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "primereact/button";
-import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 const PaymentFailed = () => {
@@ -76,7 +75,7 @@ const PaymentFailed = () => {
 
   return (
     <>
-      <Header />
+
       <div className="flex flex-column align-items-center justify-content-center p-5" style={{ minHeight: "60vh", backgroundColor: "#f9fafb" }}>
         <div className="surface-card border-round-lg shadow-2 p-5 text-center" style={{ maxWidth: "600px", width: "100%" }}>
           {/* Icon thất bại */}

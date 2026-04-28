@@ -1,5 +1,6 @@
 # Thư mục node_modules chứa hàng ngàn file từ npm
 node_modules/
+scraper/
 
 # File log
 *.log

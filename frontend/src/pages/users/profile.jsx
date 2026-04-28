@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import api from "../../utils/axiosInstance";
 import { Card } from "primereact/card";
@@ -386,7 +385,6 @@ function Profile() {
   if (loading) {
     return (
       <>
-        <Header />
         <div className="flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
           <i className="pi pi-spin pi-spinner text-4xl text-blue-500"></i>
           <p className="ml-3 text-xl">Đang tải...</p>
@@ -399,7 +397,6 @@ function Profile() {
   if (!user) {
     return (
       <>
-        <Header />
         <div className="p-5 text-center">
           <Message severity="error" text="Không thể tải thông tin người dùng" />
         </div>
@@ -410,7 +407,7 @@ function Profile() {
 
   return (
     <>
-      <Header />
+
       <div className="p-4">
         <Card className="p-4 shadow-3">
           <h1 className="mb-4">👤 Hồ sơ cá nhân</h1>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
@@ -611,7 +610,7 @@ const Checkout = () => {
     }
   };
 
-  const subtotal = cart.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
+  const subtotal = cart.reduce((sum, item) => sum + (Number(item.price) || (Number(item.product?.price) || 0) * item.quantity), 0);
   const tax = subtotal * 0.1;
   const supportFee = support ? 55000 : 0;
   const actualShippingFee = freeShipping ? 0 : shippingFee;
@@ -626,7 +625,6 @@ const Checkout = () => {
   if (loading) {
     return (
       <>
-        <Header />
         <div className="p-5 text-center">Đang tải...</div>
         <Footer />
       </>
@@ -636,7 +634,7 @@ const Checkout = () => {
   return (
     <>
       <Toast ref={toast} />
-      <Header />
+
       <div className="p-5 bg-gray-50 flex justify-content-center">
         <div style={{ width: "90vw", maxWidth: "1800px", margin: "0 auto", display: "flex", gap: "2rem" }}>
 
