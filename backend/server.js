@@ -23,6 +23,8 @@ const checkoutRoutes = require("./src/routes/checkoutRoutes");
 const paymentRoutes = require("./src/routes/paymentRoutes");
 const loyaltyRoutes = require("./src/routes/loyaltyRoutes");
 const socialRoutes = require("./src/routes/socialRoutes");
+const Product = require("./src/models/Product");
+const runSeed = require("./src/seed/runSeed");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -277,4 +279,19 @@ io.on("connection", (socket) => {
 server.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
   console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
+
+  // Run auto-seed in background after server is up
+  // This prevents Render from timing out during deployment
+  setTimeout(async () => {
+    try {
+      const productCount = await Product.countDocuments();
+      if (productCount === 0) {
+        console.log("No data found in database. Initializing background seed...");
+        await runSeed();
+      }
+    } catch (err) {
+      console.error("Background auto-seed error:", err);
+    }
+  }, 1000);
 });
+

@@ -7,9 +7,31 @@ const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/shopdb";
 // Hàm lấy provinces + districts + wards
 async function loadProvincesData() {
   const url = "https://provinces.open-api.vn/api/v1/?depth=3";
-  const res = await axios.get(url);
-  return res.data; // mảng province
+  try {
+    console.log("Fetching provinces from API...");
+    const res = await axios.get(url, { timeout: 10000 }); // 10s timeout
+    return res.data;
+  } catch (err) {
+    console.warn("Could not load provinces from API, using fallback data:", err.message);
+    return [
+      {
+        name: "Thành phố Hồ Chí Minh",
+        districts: [
+          { name: "Quận 1", wards: [{ name: "Phường Bến Nghé" }, { name: "Phường Đa Kao" }] },
+          { name: "Quận 3", wards: [{ name: "Phường Võ Thị Sáu" }] }
+        ]
+      },
+      {
+        name: "Thành phố Hà Nội",
+        districts: [
+          { name: "Quận Hoàn Kiếm", wards: [{ name: "Phường Hàng Đào" }] },
+          { name: "Quận Ba Đình", wards: [{ name: "Phường Phúc Xá" }] }
+        ]
+      }
+    ];
+  }
 }
+
 
 function randomPoints() {
   return Math.floor(Math.random() * 500);
