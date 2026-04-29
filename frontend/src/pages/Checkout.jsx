@@ -924,72 +924,84 @@ const Checkout = () => {
       </div>
 
       <Dialog
-        header={isEditingAddress ? "Sửa địa chỉ giao hàng" : "Thêm địa chỉ giao hàng"}
+        header={<span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">{isEditingAddress ? "Sửa địa chỉ giao hàng" : "Thêm địa chỉ giao hàng"}</span>}
         visible={showAddressDialog}
-        style={{ width: "500px" }}
+        style={{ width: "500px", borderRadius: '8px' }}
         onHide={() => setShowAddressDialog(false)}
         footer={
-          <div className="flex justify-content-end gap-2">
-            <Button
-              label="Hủy"
-              text
+          <div className="flex justify-content-end gap-3 p-4">
+            <button
               onClick={() => {
                 setShowAddressDialog(false);
                 setNewAddress({ receiver: "", phone: "", address: "" });
                 setIsEditingAddress(false);
               }}
-            />
-            <Button
-              label={isEditingAddress ? "Cập nhật" : "Lưu"}
+              className="bg-transparent border-none text-[10px] font-black uppercase tracking-widest text-gray-400 cursor-pointer hover:text-black transition-colors"
+            >
+              Hủy bỏ
+            </button>
+            <button
               onClick={handleSaveAddress}
-            />
+              className="bg-black text-white px-8 py-3 text-[10px] font-black uppercase tracking-[0.2em] border-none cursor-pointer hover:bg-gray-800 transition-all shadow-lg shadow-black/10"
+            >
+              {isEditingAddress ? "Cập nhật" : "Lưu địa chỉ"}
+            </button>
           </div>
         }
+        className="uq-dialog"
       >
-        <div className="flex flex-column gap-3">
-          <div>
-            <label className="block mb-1 font-semibold">Tên người nhận *</label>
-            <InputText
-              value={newAddress.receiver}
-              onChange={(e) => setNewAddress({ ...newAddress, receiver: e.target.value })}
-              className="w-full"
-              placeholder="Họ và tên"
-            />
+        <div className="flex flex-column gap-5 p-2">
+          <div className="grid grid-nogutter gap-4">
+            <div className="col">
+              <label className="block mb-2 text-[10px] font-black uppercase tracking-widest text-gray-400">Tên người nhận *</label>
+              <InputText
+                value={newAddress.receiver}
+                onChange={(e) => setNewAddress({ ...newAddress, receiver: e.target.value })}
+                className="w-full border-none border-bottom-2 border-100 border-noround text-sm p-3 focus:border-black transition-all outline-none"
+                placeholder="Họ và tên"
+              />
+            </div>
+            <div className="col">
+              <label className="block mb-2 text-[10px] font-black uppercase tracking-widest text-gray-400">Số điện thoại *</label>
+              <InputText
+                value={newAddress.phone}
+                onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value })}
+                className="w-full border-none border-bottom-2 border-100 border-noround text-sm p-3 focus:border-black transition-all outline-none"
+                placeholder="0xxx xxx xxx"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block mb-1 font-semibold">Số điện thoại *</label>
-            <InputText
-              value={newAddress.phone}
-              onChange={(e) => setNewAddress({ ...newAddress, phone: e.target.value })}
-              className="w-full"
-              placeholder="0xxx xxx xxx"
-            />
-          </div>
-          <div className="flex flex-column gap-2">
-            <label className="block font-semibold">Địa chỉ nhận hàng *</label>
 
-            <Dropdown
-              value={addrForm.provinceCode}
-              options={provinces}
-              optionLabel="name"
-              optionValue="code"
-              onChange={onProvinceChange}
-              placeholder="Tỉnh/Thành phố"
-              filter
-              className="w-full"
-            />
+          <div className="flex flex-column gap-4">
+            <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Địa chỉ nhận hàng *</label>
 
-            <Dropdown
-              value={addrForm.districtCode}
-              options={districts}
-              optionLabel="name"
-              optionValue="code"
-              onChange={onDistrictChange}
-              placeholder="Quận/Huyện"
-              disabled={!addrForm.provinceCode}
-              filter
-              className="w-full"
-            />
+            <div className="grid grid-nogutter gap-3">
+              <div className="col">
+                <Dropdown
+                  value={addrForm.provinceCode}
+                  options={provinces}
+                  optionLabel="name"
+                  optionValue="code"
+                  onChange={onProvinceChange}
+                  placeholder="Tỉnh/Thành phố"
+                  filter
+                  className="w-full border-none border-bottom-2 border-100 border-noround text-xs focus:border-black"
+                />
+              </div>
+              <div className="col">
+                <Dropdown
+                  value={addrForm.districtCode}
+                  options={districts}
+                  optionLabel="name"
+                  optionValue="code"
+                  onChange={onDistrictChange}
+                  placeholder="Quận/Huyện"
+                  disabled={!addrForm.provinceCode}
+                  filter
+                  className="w-full border-none border-bottom-2 border-100 border-noround text-xs focus:border-black"
+                />
+              </div>
+            </div>
 
             <Dropdown
               value={addrForm.wardCode}
@@ -1000,60 +1012,59 @@ const Checkout = () => {
               placeholder="Xã/Phường"
               disabled={!addrForm.districtCode}
               filter
-              className="w-full"
+              className="w-full border-none border-bottom-2 border-100 border-noround text-xs focus:border-black"
             />
 
             <InputText
               value={addrForm.addressDetail}
               onChange={(e) => setAddrForm({ ...addrForm, addressDetail: e.target.value })}
               placeholder="Số nhà, tên đường..."
-              className="w-full"
+              className="w-full border-none border-bottom-2 border-100 border-noround text-sm p-3 focus:border-black transition-all outline-none"
             />
           </div>
         </div>
       </Dialog>
+
       <Dialog
         visible={showSuccessDialog}
-        onHide={() => { }} // Không cho đóng bằng cách click ra ngoài để bắt buộc chọn action
+        onHide={() => { }} 
         modal
-        showHeader={false} // Ẩn header mặc định để tự custom cho đẹp
-        style={{ width: '450px', borderRadius: '15px', overflow: 'hidden' }}
-        contentStyle={{ padding: 0, borderRadius: '15px' }}
+        showHeader={false} 
+        style={{ width: '480px', borderRadius: '12px', overflow: 'hidden' }}
+        contentStyle={{ padding: 0, borderRadius: '12px' }}
       >
-        <div className="flex flex-column align-items-center justify-content-center p-5 text-center">
+        <div className="flex flex-column align-items-center justify-content-center p-8 text-center bg-white">
           <div
-            className="flex align-items-center justify-content-center border-circle bg-green-100 mb-4"
-            style={{ width: '80px', height: '80px' }}
+            className="flex align-items-center justify-content-center bg-gray-50 border-1 border-100 mb-6"
+            style={{ width: '100px', height: '100px', borderRadius: '50%' }}
           >
-            <i className="pi pi-check text-green-600 text-5xl"></i>
+            <i className="pi pi-check text-black text-4xl font-black"></i>
           </div>
 
-          <h2 className="text-900 font-bold mb-2">Đặt hàng thành công!</h2>
-          <p className="text-600 line-height-3 mb-4">
-            Cảm ơn bạn đã mua sắm. Đơn hàng
-            <strong className="text-900 mx-1">#{createdOrderId?.slice(-6).toUpperCase()}</strong>
-            đã được ghi nhận.
-            <br />
-            Vui lòng kiểm tra email để xem chi tiết.
+          <h2 className="text-2xl font-black uppercase tracking-tighter text-black mb-3">Đặt hàng thành công!</h2>
+          <p className="text-gray-400 text-xs font-bold uppercase tracking-widest leading-relaxed mb-8">
+            Cảm ơn bạn đã mua sắm tại Uniqlo.<br/>Đơn hàng 
+            <strong className="text-black mx-1">#{createdOrderId?.slice(-6).toUpperCase()}</strong>
+            đã được tiếp nhận.<br />
+            Chúng tôi đã gửi xác nhận đến email của bạn.
           </p>
 
-          <div className="flex flex-column gap-2 w-full">
-            {isLoggedIn ? (
-              <Button
-                label="Xem đơn hàng của tôi"
-                icon="pi pi-list"
-                className="w-full border-round-lg"
-                style={{ background: "#0d6efd", border: "none" }}
+          <div className="flex flex-column gap-3 w-full">
+            {isLoggedIn && (
+              <button
+                className="w-full bg-black text-white py-4 text-[10px] font-black uppercase tracking-[0.25em] border-none cursor-pointer hover:bg-gray-800 transition-all shadow-lg shadow-black/10"
                 onClick={() => navigate("/profile")}
-              />
-            ) : null}
+              >
+                Xem chi tiết đơn hàng
+              </button>
+            )}
 
-            <Button
-              label="Tiếp tục mua sắm"
-              icon="pi pi-shopping-bag"
-              className="w-full border-round-lg p-button-outlined p-button-secondary"
+            <button
+              className="w-full bg-white text-black py-4 text-[10px] font-black uppercase tracking-[0.25em] border-1 border-200 cursor-pointer hover:border-black transition-all"
               onClick={() => navigate("/")}
-            />
+            >
+              Tiếp tục mua sắm
+            </button>
           </div>
         </div>
       </Dialog>

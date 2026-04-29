@@ -113,62 +113,81 @@ const Wishlist = () => {
     <>
       <Toast ref={toast} />
 
-      <div className="p-4" style={{ maxWidth: "900px", margin: "0 auto", minHeight: "60vh" }}>
-        <h2 className="mb-4 text-2xl font-bold border-bottom-1 border-300 pb-3">
-            Sản phẩm yêu thích ({wishlist.length})
-        </h2>
-        
-        {loading ? (
-            <p className="text-center">Đang tải...</p>
-        ) : wishlist.length === 0 ? (
-          <div className="text-center p-5 surface-50 border-round">
-            <i className="pi pi-heart text-500 text-4xl mb-3"></i>
-            <p className="text-700 text-lg">Chưa có sản phẩm yêu thích nào.</p>
-            <Button label="Tiếp tục mua sắm" text onClick={() => window.location.href = '/'} />
+      <div className="bg-[#fdfdfd] min-h-screen pb-20">
+        <div className="max-w-screen-md mx-auto px-4 pt-10">
+          <div className="flex justify-content-between align-items-end mb-8 pb-4 border-bottom-2 border-black">
+            <h1 className="m-0 text-2xl font-black uppercase tracking-tighter text-black">Danh sách yêu thích</h1>
+            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{wishlist.length} sản phẩm</span>
           </div>
-        ) : (
-          <div className="flex flex-column gap-3">
-            {wishlist.map((p) => (
-              <div
-                key={p.id}
-                className="flex gap-3 align-items-center border-1 surface-border border-round p-3 shadow-1 bg-white hover:shadow-2 transition-duration-200"
-              >
-                {/* ảnh */}
-                <div
-                  className="flex align-items-center justify-content-center border-1 surface-border border-round overflow-hidden"
-                  style={{ width: 100, height: 100, minWidth: 100 }}
-                >
-                  <img
-                    src={p.img}
-                    alt={p.name}
-                    style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                  />
+          
+          {loading ? (
+            <div className="py-20 text-center">
+              <i className="pi pi-spin pi-spinner text-gray-300 text-3xl"></i>
+            </div>
+          ) : wishlist.length === 0 ? (
+            <div className="py-20 text-center bg-white border-round-lg border-1 border-100 shadow-sm">
+              <div className="flex justify-content-center mb-6">
+                <div className="w-24 h-24 bg-gray-50 border-circle flex align-items-center justify-content-center">
+                  <i className="pi pi-heart text-gray-200 text-4xl"></i>
                 </div>
-
-                {/* thông tin */}
-                <div className="flex flex-column flex-1 overflow-hidden gap-1">
-                  <span className="font-bold text-900 text-lg white-space-nowrap overflow-hidden text-overflow-ellipsis">
-                    {p.name}
-                  </span>
-                  <span className="text-red-600 font-bold text-xl">
-                    {Number(p.price).toLocaleString("vi-VN")}₫
-                  </span>
-                </div>
-
-                {/* nút xóa */}
-                <Button
-                  icon="pi pi-trash"
-                  severity="danger"
-                  outlined
-                  rounded
-                  aria-label="Delete"
-                  tooltip="Bỏ thích"
-                  onClick={() => removeItem(p.id)}
-                />
               </div>
-            ))}
-          </div>
-        )}
+              <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-8">Danh sách yêu thích của bạn đang trống</p>
+              <button 
+                onClick={() => window.location.href = '/search'}
+                className="bg-black text-white px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em] border-none cursor-pointer hover:bg-gray-800 transition-all shadow-lg shadow-black/10"
+              >
+                Tiếp tục mua sắm
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-column gap-4">
+              {wishlist.map((p) => (
+                <div
+                  key={p.id}
+                  className="p-4 md:p-6 bg-white border-1 border-100 border-round hover:border-gray-300 transition-all flex align-items-center gap-6 group"
+                >
+                  <div
+                    className="w-24 h-32 flex-shrink-0 overflow-hidden bg-gray-50 border-round cursor-pointer"
+                    onClick={() => window.location.href = `/product/${p.id}`}
+                  >
+                    <img
+                      src={p.img}
+                      alt={p.name}
+                      className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
+                    />
+                  </div>
+
+                  <div className="flex-1">
+                    <div className="flex justify-content-between align-items-start mb-2">
+                      <span 
+                        className="text-sm font-black uppercase tracking-tight text-black cursor-pointer hover:text-red-600 transition-colors"
+                        onClick={() => window.location.href = `/product/${p.id}`}
+                      >
+                        {p.name}
+                      </span>
+                      <button
+                        onClick={() => removeItem(p.id)}
+                        className="bg-transparent border-none text-gray-300 hover:text-red-500 cursor-pointer transition-colors p-2"
+                        title="Xóa khỏi yêu thích"
+                      >
+                        <i className="pi pi-trash text-sm"></i>
+                      </button>
+                    </div>
+                    <div className="text-lg font-black text-black tracking-tight mb-6">
+                      {Number(p.price).toLocaleString("vi-VN")}₫
+                    </div>
+                    <button 
+                      onClick={() => window.location.href = `/product/${p.id}`}
+                      className="bg-white text-black border-1 border-black px-6 py-2 text-[9px] font-black uppercase tracking-[0.2em] cursor-pointer hover:bg-black hover:text-white transition-all"
+                    >
+                      Xem chi tiết
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
       <Footer />
     </>

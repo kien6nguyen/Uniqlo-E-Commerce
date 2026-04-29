@@ -41,7 +41,8 @@ const ProductListPage = () => {
   const [products, setProducts] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null);
+  const dropdownRef = useRef(null);
 
   // Filter attributes
   const [availableBrands, setAvailableBrands] = useState([]);
@@ -62,6 +63,16 @@ const ProductListPage = () => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 5000000]);
   const [minRating, setMinRating] = useState(0);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const urlParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const keyword = urlParams.get("q");
@@ -139,7 +150,6 @@ const ProductListPage = () => {
             if (CATEGORY_LABELS[categoryToFilter]) {
               api.append("category", categoryToFilter);
             } else {
-              // If it's a specific term like "Áo thun", treat it as a search keyword
               api.append("search", categoryToFilter);
             }
         }
@@ -202,7 +212,6 @@ const ProductListPage = () => {
     return `${import.meta.env.VITE_API_URL || ""}/${img.replace(/\\/g, "/")}`;
   };
 
-  // Determine Title
   const getPageTitle = () => {
     if (keyword) return `Kết quả cho: "${keyword}"`;
     if (selectedCategories.length > 0) return CATEGORY_LABELS[selectedCategories[0]] || selectedCategories[0];
@@ -231,72 +240,95 @@ const ProductListPage = () => {
         </div>
       </div>
 
-      {/* Filter Bar */}
-      <div className="sticky top-[90px] z-[100] bg-white border-bottom-1 border-gray-100 shadow-sm">
-        <div className="max-w-screen-xl mx-auto px-4 py-3 flex justify-content-between align-items-center">
-          <div className="flex gap-4 align-items-center">
-             <button 
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="flex align-items-center gap-2 bg-black text-white px-4 py-2.5 rounded text-[10px] font-black uppercase tracking-[0.2em] border-none cursor-pointer hover:bg-gray-800 transition-all shadow-md"
-             >
-               <i className="pi pi-filter"></i> Bộ lọc {activeFilterCount > 0 && `(${activeFilterCount})`}
-             </button>
-             
-             <div className="hidden lg:flex gap-2">
-                {SORT_OPTIONS.map(opt => (
-                  <button 
-                    key={opt.value}
-                    onClick={() => setSortOrder(opt.value)}
-                    className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border-1 transition-all ${sortOrder === opt.value ? 'bg-[#111] text-white border-black' : 'bg-transparent text-gray-400 border-gray-100 hover:border-gray-300'}`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-             </div>
-          </div>
-
-          <div className="flex align-items-center gap-3">
-             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest hidden md:block">Hiển thị:</span>
-             <select 
-               className="border-none bg-transparent text-xs font-black uppercase tracking-widest cursor-pointer outline-none"
-               value={rows}
-               disabled
-             >
-               <option value="12">12 mỗi trang</option>
-             </select>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-screen-xl mx-auto px-4 py-8">
-        <div className="grid">
-          {/* Sidebar Filters */}
-          {sidebarOpen && (
-            <div className="col-12 lg:col-3 mb-6 lg:mb-0">
-               <div className="bg-white p-6 rounded-xl border-1 border-gray-50 shadow-sm sticky top-48">
-                  <div className="flex justify-content-between align-items-center mb-6">
-                    <h3 className="m-0 text-xs font-black uppercase tracking-[0.2em]">Lọc sản phẩm</h3>
-                    <button onClick={resetAllFilters} className="bg-transparent border-none text-[10px] font-black text-red-500 cursor-pointer hover:underline uppercase tracking-widest">Xóa hết</button>
+      {/* Horizontal Filter Bar */}
+      <div 
+        ref={dropdownRef} 
+        className="sticky-filter-bar"
+        style={{ 
+          position: 'sticky', 
+          top: '90px', 
+          zIndex: 999, 
+          backgroundColor: '#fff', 
+          borderBottom: '1px solid #eee', 
+          overflow: 'visible',
+          padding: '12px 0'
+        }}
+      >
+        <div className="max-w-screen-xl mx-auto px-4" style={{ overflow: 'visible' }}>
+          <div className="flex align-items-center justify-content-between" style={{ overflow: 'visible' }}>
+            
+            <div className="flex align-items-center gap-4">
+              {/* Gender Filter */}
+              <div className="filter-group">
+                <button 
+                  onClick={() => setActiveDropdown(activeDropdown === 'gender' ? null : 'gender')}
+                  className={`filter-trigger ${selectedGender !== 'all' ? 'active' : ''}`}
+                >
+                  <span className="label">Giới tính</span>
+                  {selectedGender !== 'all' && <span className="badge">{GENDER_LABELS[selectedGender]?.charAt(0)}</span>}
+                  <i className={`pi pi-angle-${activeDropdown === 'gender' ? 'up' : 'down'}`}></i>
+                </button>
+                {activeDropdown === 'gender' && (
+                  <div className="dropdown-menu">
+                    {GENDER_OPTIONS.map(g => (
+                      <div 
+                        key={g.value}
+                        onClick={() => { setSelectedGender(g.value); setActiveDropdown(null); setPage(1); }}
+                        className={`dropdown-item ${selectedGender === g.value ? 'selected' : ''}`}
+                      >
+                        {g.label}
+                        {selectedGender === g.value && <i className="pi pi-check"></i>}
+                      </div>
+                    ))}
                   </div>
+                )}
+              </div>
 
-                  <FilterSection title="Giới tính">
-                    <div className="flex flex-column gap-2">
-                      {GENDER_OPTIONS.map(g => (
-                        <label key={g.value} className="flex align-items-center gap-3 cursor-pointer group">
-                          <input 
-                            type="radio" 
-                            name="gender" 
-                            checked={selectedGender === g.value} 
-                            onChange={() => setSelectedGender(g.value)}
-                            className="w-4 h-4 accent-black"
-                          />
-                          <span className={`text-xs font-bold uppercase tracking-widest transition-colors ${selectedGender === g.value ? 'text-black' : 'text-gray-400 group-hover:text-black'}`}>{g.label}</span>
-                        </label>
-                      ))}
+              {/* Product Line Filter */}
+              {availableProductLines.length > 0 && (
+                <div className="filter-group">
+                  <button 
+                    onClick={() => setActiveDropdown(activeDropdown === 'line' ? null : 'line')}
+                    className={`filter-trigger ${selectedProductLines.length > 0 ? 'active' : ''}`}
+                  >
+                    <span className="label">Dòng sản phẩm</span>
+                    {selectedProductLines.length > 0 && <span className="badge">{selectedProductLines.length}</span>}
+                    <i className={`pi pi-angle-${activeDropdown === 'line' ? 'up' : 'down'}`}></i>
+                  </button>
+                  {activeDropdown === 'line' && (
+                    <div className="dropdown-menu wide">
+                      <div className="dropdown-scroll">
+                        {availableProductLines.map(line => (
+                          <div 
+                            key={line}
+                            onClick={() => toggleFilter(selectedProductLines, setSelectedProductLines, line)}
+                            className={`dropdown-item checkbox-item ${selectedProductLines.includes(line) ? 'selected' : ''}`}
+                          >
+                            <div className={`checkbox ${selectedProductLines.includes(line) ? 'checked' : ''}`}>
+                              {selectedProductLines.includes(line) && <i className="pi pi-check"></i>}
+                            </div>
+                            <span>{line}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </FilterSection>
+                  )}
+                </div>
+              )}
 
-                  <FilterSection title="Khoảng giá">
+              {/* Price Filter */}
+              <div className="filter-group">
+                <button 
+                  onClick={() => setActiveDropdown(activeDropdown === 'price' ? null : 'price')}
+                  className={`filter-trigger ${priceRange[1] < maxPriceLimit ? 'active' : ''}`}
+                >
+                  <span className="label">Khoảng giá</span>
+                  {priceRange[1] < maxPriceLimit && <span className="badge">1</span>}
+                  <i className={`pi pi-angle-${activeDropdown === 'price' ? 'up' : 'down'}`}></i>
+                </button>
+                {activeDropdown === 'price' && (
+                  <div className="dropdown-menu price-menu">
+                    <p className="menu-title">Chọn giá tối đa</p>
                     <input 
                       type="range" 
                       min="0" 
@@ -304,58 +336,97 @@ const ProductListPage = () => {
                       step="100000" 
                       value={priceRange[1]} 
                       onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
-                      className="w-full accent-black mb-2"
+                      className="price-slider"
                     />
-                    <div className="flex justify-content-between text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                      <span>0₫</span>
-                      <span className="text-black">{priceRange[1].toLocaleString()}₫</span>
+                    <div className="price-display">
+                       <span className="text-gray-500">Dưới:</span>
+                       <span className="price-value">{priceRange[1].toLocaleString('vi-VN')}₫</span>
                     </div>
-                  </FilterSection>
+                  </div>
+                )}
+              </div>
 
-                  {availableCategories.length > 0 && (
-                    <FilterSection title="Danh mục">
-                       <div className="flex flex-wrap gap-2">
-                          {availableCategories.map(cat => (
-                            <button 
-                              key={cat}
-                              onClick={() => toggleFilter(selectedCategories, setSelectedCategories, cat)}
-                              className={`px-3 py-2 rounded text-[10px] font-bold uppercase tracking-widest border-1 transition-all ${selectedCategories.includes(cat) ? 'bg-black text-white border-black' : 'bg-white text-gray-500 border-gray-100 hover:border-gray-300'}`}
-                            >
-                              {CATEGORY_LABELS[cat] || cat}
-                            </button>
-                          ))}
-                       </div>
-                    </FilterSection>
-                  )}
+              {/* Rating Filter */}
+              <div className="filter-group">
+                <button 
+                  onClick={() => setActiveDropdown(activeDropdown === 'rating' ? null : 'rating')}
+                  className={`filter-trigger ${minRating > 0 ? 'active' : ''}`}
+                >
+                  <span className="label">Đánh giá</span>
+                  {minRating > 0 && <span className="badge">{minRating}</span>}
+                  <i className={`pi pi-angle-${activeDropdown === 'rating' ? 'up' : 'down'}`}></i>
+                </button>
+                {activeDropdown === 'rating' && (
+                  <div className="dropdown-menu">
+                    {[0, 5, 4, 3, 2, 1].map(star => (
+                      <div 
+                        key={star}
+                        onClick={() => { setMinRating(star); setActiveDropdown(null); setPage(1); }}
+                        className={`dropdown-item ${minRating === star ? 'selected' : ''}`}
+                      >
+                        {star === 0 ? (
+                          <span className="text-sm">Tất cả đánh giá</span>
+                        ) : (
+                          <div className="flex align-items-center gap-1">
+                            {[1, 2, 3, 4, 5].map(i => (
+                              <i key={i} className={`pi pi-star-fill star-icon ${i <= star ? 'active' : ''}`}></i>
+                            ))}
+                            <span className="star-count">({star}+ Sao)</span>
+                          </div>
+                        )}
+                        {minRating === star && <i className="pi pi-check"></i>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-                  {availableBrands.length > 0 && (
-                    <FilterSection title="Thương hiệu">
-                       <div className="flex flex-column gap-2">
-                          {availableBrands.map(brand => (
-                            <label key={brand} className="flex align-items-center gap-3 cursor-pointer group">
-                              <input 
-                                type="checkbox" 
-                                checked={selectedBrands.includes(brand)} 
-                                onChange={() => toggleFilter(selectedBrands, setSelectedBrands, brand)}
-                                className="w-4 h-4 accent-black"
-                              />
-                              <span className={`text-xs font-bold uppercase tracking-widest transition-colors ${selectedBrands.includes(brand) ? 'text-black' : 'text-gray-400 group-hover:text-black'}`}>{brand}</span>
-                            </label>
-                          ))}
-                       </div>
-                    </FilterSection>
-                  )}
-               </div>
+              {activeFilterCount > 0 && (
+                <button onClick={resetAllFilters} className="clear-filters-btn">
+                  Xóa lọc ({activeFilterCount})
+                </button>
+              )}
             </div>
-          )}
 
-          {/* Product Grid */}
-          <div className={`col-12 ${sidebarOpen ? 'lg:col-9' : 'lg:col-12'}`}>
+            <div className="flex align-items-center">
+              <div className="filter-group">
+                <button 
+                  onClick={() => setActiveDropdown(activeDropdown === 'sort' ? null : 'sort')}
+                  className="filter-trigger sort-trigger"
+                >
+                  <span className="sort-label">Sắp xếp:</span>
+                  <span className="current-sort">{SORT_OPTIONS.find(o => o.value === sortOrder)?.label}</span>
+                  <i className={`pi pi-angle-${activeDropdown === 'sort' ? 'up' : 'down'}`}></i>
+                </button>
+                {activeDropdown === 'sort' && (
+                  <div className="dropdown-menu right-aligned">
+                    {SORT_OPTIONS.map(opt => (
+                      <div 
+                        key={opt.value}
+                        onClick={() => { setSortOrder(opt.value); setActiveDropdown(null); setPage(1); }}
+                        className={`dropdown-item ${sortOrder === opt.value ? 'selected' : ''}`}
+                      >
+                        {opt.label}
+                        {sortOrder === opt.value && <i className="pi pi-check"></i>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-screen-xl mx-auto px-4 py-12" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="grid">
+          <div className="col-12">
             {loading ? (
               <div className="grid">
                 {[1,2,3,4,5,6,7,8].map(i => (
-                  <div key={i} className="col-6 md:col-4 lg:col-3 mb-6">
-                    <Skeleton width="100%" height="300px" className="mb-2" />
+                  <div key={i} className="col-6 md:col-4 lg:col-3 mb-8">
+                    <Skeleton width="100%" height="320px" className="mb-3" />
                     <Skeleton width="60%" height="15px" className="mb-2" />
                     <Skeleton width="40%" height="20px" />
                   </div>
@@ -365,7 +436,7 @@ const ProductListPage = () => {
               <>
                 <div className="grid">
                   {products.map(product => (
-                    <div key={product._id} className="col-6 md:col-4 lg:col-3 mb-6">
+                    <div key={product._id} className="col-6 md:col-4 lg:col-3 mb-8">
                       <ProductCard
                         id={product._id}
                         name={product.name}
@@ -382,7 +453,7 @@ const ProductListPage = () => {
                 </div>
 
                 {totalRecords > rows && (
-                  <div className="mt-12 bg-white rounded-xl shadow-sm border-1 border-gray-50 overflow-hidden">
+                  <div className="mt-16 pagination-container">
                     <Paginator
                       first={first}
                       rows={rows}
@@ -392,20 +463,17 @@ const ProductListPage = () => {
                         setPage(e.page + 1); 
                         window.scrollTo({ top: 0, behavior: "smooth" }); 
                       }}
-                      className="border-none py-4"
+                      className="p-paginator-custom"
                     />
                   </div>
                 )}
               </>
             ) : (
-              <div className="flex flex-column align-items-center justify-content-center py-20 bg-white rounded-3xl border-dashed border-2 border-gray-100">
-                <i className="pi pi-search text-6xl text-gray-100 mb-6"></i>
-                <h3 className="m-0 text-xl font-black uppercase tracking-tight mb-2">Không tìm thấy sản phẩm</h3>
-                <p className="text-gray-400 text-sm font-medium mb-8">Hãy thử thay đổi từ khóa hoặc bộ lọc của bạn</p>
-                <button 
-                  onClick={resetAllFilters}
-                  className="bg-black text-white px-8 py-3 rounded-full text-xs font-black uppercase tracking-[0.2em] border-none cursor-pointer hover:scale-105 transition-transform"
-                >
+              <div className="no-products-container">
+                <i className="pi pi-search empty-icon"></i>
+                <h3 className="empty-title">Không tìm thấy sản phẩm</h3>
+                <p className="empty-subtitle">Hãy thử thay đổi từ khóa hoặc bộ lọc của bạn</p>
+                <button onClick={resetAllFilters} className="reset-btn">
                   Xem tất cả sản phẩm
                 </button>
               </div>
@@ -414,18 +482,297 @@ const ProductListPage = () => {
         </div>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-12">
         <Footer />
       </div>
+
+      <style>{`
+        .sticky-filter-bar {
+          transition: transform 0.3s ease;
+        }
+        .filter-group {
+          position: relative;
+        }
+        .filter-trigger {
+          background: none;
+          border: none;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 16px;
+          border-radius: 4px;
+          transition: all 0.2s;
+          color: #666;
+        }
+        .filter-trigger:hover {
+          background-color: #f8f8f8;
+          color: #000;
+        }
+        .filter-trigger.active {
+          color: #000;
+          font-weight: bold;
+        }
+        .filter-trigger .label {
+          font-size: 10px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+        }
+        .filter-trigger .badge {
+          background: #000;
+          color: #fff;
+          font-size: 9px;
+          font-weight: 900;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .filter-trigger i {
+          font-size: 10px;
+          color: #ccc;
+        }
+        .sort-trigger {
+          padding-right: 0;
+        }
+        .sort-trigger:hover {
+          background: none;
+        }
+        .sort-label {
+          font-size: 9px;
+          font-weight: 900;
+          color: #999;
+          text-transform: uppercase;
+          letter-spacing: 0.2em;
+        }
+        .current-sort {
+          font-size: 11px;
+          font-weight: 900;
+          color: #000;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .dropdown-menu {
+          position: absolute;
+          top: calc(100% + 8px);
+          left: 0;
+          background: #fff;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+          border: 1px solid #eee;
+          border-radius: 8px;
+          min-width: 200px;
+          z-index: 1000;
+          padding: 8px;
+          animation: dropDownIn 0.2s ease-out;
+        }
+        .dropdown-menu.right-aligned {
+          left: auto;
+          right: 0;
+        }
+        .dropdown-menu.wide {
+          min-width: 280px;
+        }
+        .dropdown-scroll {
+          max-height: 400px;
+          overflow-y: auto;
+          padding-right: 4px;
+        }
+        @keyframes dropDownIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .dropdown-item {
+          padding: 12px 16px;
+          font-size: 11px;
+          font-weight: 700;
+          color: #555;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          cursor: pointer;
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          transition: all 0.15s;
+        }
+        .dropdown-item:hover {
+          background-color: #f5f5f5;
+          color: #000;
+        }
+        .dropdown-item.selected {
+          background-color: #f9f9f9;
+          color: #000;
+          font-weight: 900;
+        }
+        .checkbox-item {
+          justify-content: flex-start;
+          gap: 12px;
+        }
+        .checkbox {
+          width: 18px;
+          height: 18px;
+          border: 2px solid #ddd;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s;
+        }
+        .checkbox.checked {
+          background: #000;
+          border-color: #000;
+        }
+        .checkbox i {
+          font-size: 9px;
+          color: #fff;
+        }
+        .price-menu {
+          padding: 24px;
+          min-width: 320px;
+        }
+        .menu-title {
+          margin: 0 0 20px 0;
+          font-size: 10px;
+          font-weight: 900;
+          color: #bbb;
+          text-transform: uppercase;
+          letter-spacing: 0.2em;
+        }
+        .price-slider {
+          width: 100%;
+          accent-color: #000;
+          height: 4px;
+          background: #eee;
+          border-radius: 2px;
+          margin-bottom: 24px;
+          cursor: pointer;
+        }
+        .price-display {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: #fdfdfd;
+          padding: 12px 20px;
+          border-radius: 8px;
+          border: 1px solid #f0f0f0;
+        }
+        .price-value {
+          font-size: 18px;
+          font-weight: 900;
+          color: #000;
+          letter-spacing: -0.02em;
+        }
+        .star-icon {
+          font-size: 12px;
+          color: #eee;
+        }
+        .star-icon.active {
+          color: #f59e0b;
+        }
+        .star-count {
+          font-size: 11px;
+          font-weight: 700;
+          color: #999;
+          margin-left: 6px;
+        }
+        .clear-filters-btn {
+          background: none;
+          border: none;
+          color: #ef4444;
+          font-size: 10px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          cursor: pointer;
+          padding: 8px 12px;
+          border-radius: 4px;
+          transition: all 0.2s;
+        }
+        .clear-filters-btn:hover {
+          background: #fff1f2;
+          text-decoration: underline;
+        }
+        .no-products-container {
+          text-align: center;
+          padding: 80px 0;
+          background: #fff;
+          border-radius: 24px;
+          border: 1px solid #f0f0f0;
+        }
+        .empty-icon {
+          font-size: 60px;
+          color: #f0f0f0;
+          margin-bottom: 32px;
+        }
+        .empty-title {
+          font-size: 24px;
+          font-weight: 900;
+          margin: 0 0 12px 0;
+          text-transform: uppercase;
+          letter-spacing: -0.02em;
+        }
+        .empty-subtitle {
+          color: #888;
+          font-size: 14px;
+          margin-bottom: 40px;
+        }
+        .reset-btn {
+          background: #000;
+          color: #fff;
+          border: none;
+          padding: 14px 40px;
+          border-radius: 100px;
+          font-size: 12px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.2em;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+        .reset-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .pagination-container {
+          background: #fff;
+          padding: 12px;
+          border-radius: 12px;
+          border: 1px solid #f0f0f0;
+        }
+        .p-paginator-custom {
+          border: none !important;
+          background: transparent !important;
+        }
+        .p-paginator-custom .p-paginator-page {
+          border-radius: 8px !important;
+          font-weight: 800 !important;
+          font-size: 13px !important;
+          min-width: 40px !important;
+          height: 40px !important;
+          color: #666 !important;
+          transition: all 0.2s !important;
+        }
+        .p-paginator-custom .p-paginator-page:hover {
+          background: #f5f5f5 !important;
+          color: #000 !important;
+        }
+        .p-paginator-custom .p-paginator-page.p-highlight {
+          background: #000 !important;
+          color: #fff !important;
+        }
+        .p-paginator-custom .p-link {
+          color: #999 !important;
+        }
+        .p-paginator-custom .p-link:hover {
+          background: #f5f5f5 !important;
+          color: #000 !important;
+        }
+      `}</style>
     </div>
   );
 };
-
-const FilterSection = ({ title, children }) => (
-  <div className="mb-8 last:mb-0">
-    <h4 className="m-0 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4">{title}</h4>
-    {children}
-  </div>
-);
 
 export default ProductListPage;

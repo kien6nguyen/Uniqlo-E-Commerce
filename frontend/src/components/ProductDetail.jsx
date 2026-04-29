@@ -140,12 +140,12 @@ const ProductDetail = () => {
       
       {/* Breadcrumb */}
       <nav className="px-4 py-3 bg-[#fdfdfd] border-bottom-1 border-gray-100">
-        <div className="max-w-screen-xl mx-auto flex align-items-center gap-2 text-[11px] font-bold tracking-widest text-gray-400 uppercase">
+        <div className="max-w-screen-xl mx-auto flex align-items-center gap-3 text-[10px] font-black tracking-[0.15em] text-gray-500 uppercase">
           <span className="cursor-pointer hover:text-black transition-colors" onClick={() => navigate("/")}>Trang chủ</span>
-          <span>/</span>
+          <i className="pi pi-angle-right text-[8px] text-gray-300"></i>
           <span className="cursor-pointer hover:text-black transition-colors" onClick={() => navigate(`/gender/${product.gender}`)}>{product.gender}</span>
-          <span>/</span>
-          <span className="text-black">{product.name}</span>
+          <i className="pi pi-angle-right text-[8px] text-gray-300"></i>
+          <span className="text-black font-black">{product.name}</span>
         </div>
       </nav>
 
@@ -189,10 +189,10 @@ const ProductDetail = () => {
           <div className="col-12 lg:col-5 lg:pl-6">
             <div className="sticky top-24">
               <div className="flex justify-content-between align-items-start mb-2">
-                <span className="text-[11px] font-black text-gray-400 tracking-[0.2em] uppercase">{product.brand || "Uniqlo LifeWear"}</span>
-                <div className="flex align-items-center gap-1 bg-yellow-50 px-2 py-1 rounded">
+                <span className="text-[11px] font-black text-gray-600 tracking-[0.2em] uppercase">{product.brand || "Uniqlo LifeWear"}</span>
+                <div className="flex align-items-center gap-2 bg-yellow-50 px-3 py-1 rounded-full">
                   <i className="pi pi-star-fill text-yellow-500 text-[10px]"></i>
-                  <span className="text-[11px] font-bold text-yellow-700">{product.averageRating || 4.8}</span>
+                  <span className="text-[11px] font-black text-yellow-800">{product.averageRating || 4.8}</span>
                 </div>
               </div>
 
@@ -209,7 +209,7 @@ const ProductDetail = () => {
                 )}
               </div>
 
-              <p className="text-gray-500 text-sm leading-relaxed mb-8 border-left-3 border-gray-100 pl-4">
+              <p className="text-gray-600 text-sm leading-relaxed mb-10 border-left-3 border-gray-100 pl-5 italic font-medium">
                 {product.description}
               </p>
 
@@ -219,14 +219,14 @@ const ProductDetail = () => {
                   <div className="flex justify-content-between align-items-center mb-3">
                     <span className="text-[11px] font-black text-[#111] tracking-widest uppercase">Màu sắc: <span className="text-gray-400 ml-1">{selectedColor}</span></span>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-3">
                     {product.tags.map(color => (
                       <div 
                         key={color}
                         onClick={() => setSelectedColor(color)}
-                        className={`w-10 h-10 rounded-full cursor-pointer border-2 transition-all p-0.5 flex align-items-center justify-content-center ${selectedColor === color ? 'border-black' : 'border-transparent'}`}
+                        className={`w-12 h-12 rounded-sm cursor-pointer border-2 transition-all p-1 flex align-items-center justify-content-center ${selectedColor === color ? 'border-black shadow-md' : 'border-gray-200 hover:border-gray-400'}`}
                       >
-                        <div className="w-full h-full rounded-full border-1 border-gray-100" style={{ backgroundColor: color.toLowerCase(), background: `linear-gradient(45deg, ${color.toLowerCase()}, #eee)` }}></div>
+                        <div className="w-full h-full rounded-sm shadow-inner" style={{ backgroundColor: color.toLowerCase(), border: '1px solid rgba(0,0,0,0.05)' }}></div>
                       </div>
                     ))}
                   </div>
@@ -245,7 +245,7 @@ const ProductDetail = () => {
                       <div key={v._id} className="col">
                         <button 
                           onClick={() => setSelectedConfig(v._id)}
-                          className={`w-full py-3 text-xs font-black border-2 transition-all rounded-md uppercase tracking-widest ${selectedConfig === v._id ? 'bg-[#111] text-white border-black shadow-lg translate-y-[-2px]' : 'bg-white text-[#111] border-gray-100 hover:border-black'}`}
+                          className={`w-full py-4 text-xs font-black border-2 transition-all rounded-sm uppercase tracking-widest ${selectedConfig === v._id ? 'bg-black text-white border-black shadow-lg translate-y-[-2px]' : 'bg-white text-black border-gray-200 hover:bg-gray-100'}`}
                         >
                           {v.name}
                         </button>
@@ -268,15 +268,55 @@ const ProductDetail = () => {
                 <button 
                   disabled={currentStock <= 0}
                   onClick={addToCart}
-                  className={`w-full py-4 text-sm font-black uppercase tracking-[0.2em] rounded-md transition-all shadow-xl active:scale-95 ${currentStock > 0 ? 'bg-[#ee1c23] text-white hover:bg-[#d0191f]' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+                  className={`w-full py-5 text-sm font-black uppercase tracking-[0.25em] transition-all border-none active:scale-95 shadow-xl shadow-black/5 ${currentStock > 0 ? 'bg-black text-white cursor-pointer hover:bg-gray-800' : 'bg-gray-100 text-gray-300 cursor-not-allowed'}`}
                 >
                   Thêm vào túi đồ
                 </button>
                 <div className="flex gap-3">
-                  <button className="flex-1 py-3 text-[11px] font-black border-2 border-gray-900 rounded-md uppercase hover:bg-gray-900 hover:text-white transition-all flex align-items-center justify-content-center gap-2 tracking-widest">
+                  <button 
+                    onClick={async () => {
+                      if (!product) return;
+                      try {
+                        const token = localStorage.getItem("token");
+                        if (!token) {
+                          // Handle local wishlist
+                          const stored = JSON.parse(localStorage.getItem("wishlist")) || [];
+                          if (!stored.find(p => p.id === (product._id || product.id))) {
+                            stored.push({
+                              id: product._id || product.id,
+                              name: product.name,
+                              price: product.price,
+                              img: product.images?.[0]
+                            });
+                            localStorage.setItem("wishlist", JSON.stringify(stored));
+                          }
+                        } else {
+                          // Handle server wishlist
+                          await fetch(`${API_BASE}/user/me/wishlist`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                            body: JSON.stringify({ productId: product._id || product.id })
+                          });
+                        }
+                        window.dispatchEvent(new Event("wishlistUpdated"));
+                        toast.current.show({ severity: "success", summary: "Thành công", detail: "Đã thêm vào yêu thích", life: 2000 });
+                      } catch (err) { console.error(err); }
+                    }}
+                    className="flex-1 py-4 text-[10px] font-black border-1 border-black rounded-sm uppercase bg-white text-black hover:bg-gray-50 transition-all flex align-items-center justify-content-center gap-2 tracking-[0.2em] cursor-pointer"
+                  >
                     <i className="pi pi-heart"></i> Yêu thích
                   </button>
-                  <button className="flex-1 py-3 text-[11px] font-black border-2 border-gray-100 rounded-md uppercase hover:bg-gray-50 transition-all flex align-items-center justify-content-center gap-2 tracking-widest">
+                  <button 
+                    onClick={() => {
+                        if (navigator.share) {
+                          navigator.share({ title: product.name, url: window.location.href });
+                        } else {
+                          navigator.clipboard.writeText(window.location.href);
+                          toast.current.show({ severity: "info", summary: "Copy", detail: "Đã copy link sản phẩm", life: 2000 });
+                        }
+                    }}
+                    className="flex-1 py-4 text-[10px] font-black border-1 border-gray-200 rounded-sm uppercase bg-white text-gray-400 hover:text-black hover:border-black transition-all flex align-items-center justify-content-center gap-2 tracking-[0.2em] cursor-pointer"
+                  >
                     <i className="pi pi-share-alt"></i> Chia sẻ
                   </button>
                 </div>
@@ -284,18 +324,22 @@ const ProductDetail = () => {
 
               {/* Extra Info */}
               <div className="border-top-1 border-gray-100 pt-6 flex flex-column gap-4">
-                <div className="flex align-items-start gap-3">
-                  <i className="pi pi-truck text-gray-400 mt-1"></i>
+                <div className="flex align-items-start gap-4">
+                  <div className="w-8 h-8 bg-gray-50 border-circle flex align-items-center justify-content-center flex-shrink-0">
+                    <i className="pi pi-truck text-black text-xs"></i>
+                  </div>
                   <div>
-                    <p className="m-0 text-xs font-bold uppercase text-[#111] mb-1">Giao hàng miễn phí</p>
-                    <p className="m-0 text-[11px] text-gray-400 leading-normal">Miễn phí giao hàng cho đơn hàng trên 999.000₫</p>
+                    <p className="m-0 text-[10px] font-black uppercase text-[#111] mb-1 tracking-widest">Giao hàng miễn phí</p>
+                    <p className="m-0 text-[11px] text-gray-400 leading-normal font-bold">Miễn phí cho đơn hàng trên 999.000₫</p>
                   </div>
                 </div>
-                <div className="flex align-items-start gap-3">
-                  <i className="pi pi-refresh text-gray-400 mt-1"></i>
+                <div className="flex align-items-start gap-4">
+                  <div className="w-8 h-8 bg-gray-50 border-circle flex align-items-center justify-content-center flex-shrink-0">
+                    <i className="pi pi-refresh text-black text-xs"></i>
+                  </div>
                   <div>
-                    <p className="m-0 text-xs font-bold uppercase text-[#111] mb-1">Đổi trả trong 30 ngày</p>
-                    <p className="m-0 text-[11px] text-gray-400 leading-normal">An tâm mua sắm với chính sách đổi trả dễ dàng</p>
+                    <p className="m-0 text-[10px] font-black uppercase text-[#111] mb-1 tracking-widest">Đổi trả trong 30 ngày</p>
+                    <p className="m-0 text-[11px] text-gray-400 leading-normal font-bold">An tâm mua sắm với chính sách đổi trả</p>
                   </div>
                 </div>
               </div>
@@ -305,43 +349,56 @@ const ProductDetail = () => {
       </main>
 
       {/* Reviews Section */}
-      <section className="bg-[#fdfdfd] py-20 border-top-1 border-gray-100">
+      <section className="bg-white py-24 border-top-1 border-gray-100">
         <div className="max-w-screen-xl mx-auto px-4">
-          <div className="flex justify-content-between align-items-end mb-10 pb-4 border-bottom-2 border-black">
-            <h2 className="m-0 text-2xl font-black uppercase tracking-tighter">Đánh giá khách hàng</h2>
-            <button className="bg-transparent border-none text-xs font-bold text-blue-600 cursor-pointer hover:underline uppercase tracking-wider">Viết đánh giá</button>
+          <div className="flex justify-content-between align-items-end mb-12 pb-4 border-bottom-2 border-black">
+            <h2 className="m-0 text-2xl font-black uppercase tracking-tighter">Đánh giá thực tế</h2>
+            <div className="flex align-items-center gap-2 text-gray-400">
+                <span className="text-[10px] font-black uppercase tracking-widest">{comments.length} đánh giá</span>
+            </div>
           </div>
           
           <div className="grid">
-            <div className="col-12 md:col-4 mb-8 md:mb-0 pr-8">
-            <div className="bg-white p-6 rounded-xl shadow-sm text-center border-1 border-gray-50">
-                <div className="text-6xl font-black text-[#111] mb-2">{product.averageRating || 5.0}</div>
-                <div className="flex justify-content-center mb-3">
-                   <Rating value={Math.round(product.averageRating || 5)} readOnly stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-400' } }} />
+            <div className="col-12 md:col-4 mb-12 md:mb-0 pr-0 md:pr-12">
+              <div className="bg-gray-50 p-8 rounded-2xl text-center">
+                <div className="text-7xl font-black text-black mb-2 tracking-tighter">{product.averageRating || 5.0}</div>
+                <div className="flex justify-content-center mb-4">
+                   <Rating value={Math.round(product.averageRating || 5)} readOnly stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-400 text-xl' }, offIcon: { className: 'text-gray-200 text-xl' } }} />
                 </div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Dựa trên {comments.length} đánh giá</p>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Đánh giá trung bình</p>
+                <button className="w-full bg-white border-1 border-black py-3 text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all cursor-pointer">Viết đánh giá của bạn</button>
               </div>
             </div>
             
             <div className="col-12 md:col-8">
               {comments.length > 0 ? (
-                <div className="flex flex-column gap-6">
+                <div className="flex flex-column gap-8">
                   {comments.map((c, i) => (
-                    <div key={i} className="bg-white p-6 rounded-xl border-1 border-gray-50 transition-transform hover:translate-x-2">
-                      <div className="flex justify-content-between mb-3">
-                        <span className="font-black text-sm uppercase">{c.user?.fullname || "Người dùng Uniqlo"}</span>
-                        <span className="text-[10px] text-gray-400 font-bold">{new Date().toLocaleDateString("vi-VN")}</span>
+                    <div key={i} className="pb-8 border-bottom-1 border-gray-100 last:border-none">
+                      <div className="flex justify-content-between align-items-center mb-4">
+                        <div className="flex align-items-center gap-3">
+                            <div className="w-10 h-10 bg-black text-white border-circle flex align-items-center justify-content-center font-black text-xs">
+                                {c.user?.fullname?.charAt(0) || "U"}
+                            </div>
+                            <div className="flex flex-column">
+                                <span className="font-black text-[11px] uppercase tracking-wider">{c.user?.fullname || "Khách hàng Uniqlo"}</span>
+                                <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">{new Date(c.createdAt || Date.now()).toLocaleDateString("vi-VN")}</span>
+                            </div>
+                        </div>
+                        <Rating value={c.rating} readOnly stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-400 text-[10px]' }, offIcon: { className: 'text-gray-200 text-[10px]' } }} />
                       </div>
-                      <div className="mb-3">
-                         <Rating value={c.rating} readOnly stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-400 text-xs' } }} />
+                      <p className="m-0 text-sm text-gray-700 leading-relaxed font-bold">"{c.comment}"</p>
+                      <div className="mt-4 flex gap-4">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-gray-300 cursor-pointer hover:text-black">Hữu ích (0)</span>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-gray-300 cursor-pointer hover:text-black">Báo cáo</span>
                       </div>
-                      <p className="m-0 text-sm text-gray-600 leading-relaxed font-medium">"{c.comment}"</p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-10 bg-white rounded-xl border-dashed border-2 border-gray-100">
-                  <p className="text-gray-400 text-sm font-bold uppercase tracking-widest">Chưa có đánh giá nào cho sản phẩm này</p>
+                <div className="text-center py-20 bg-gray-50 border-round-xl">
+                  <i className="pi pi-comments text-gray-200 text-5xl mb-4"></i>
+                  <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em]">Hãy là người đầu tiên đánh giá sản phẩm này</p>
                 </div>
               )}
             </div>

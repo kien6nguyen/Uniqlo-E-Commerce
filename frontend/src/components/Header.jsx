@@ -227,8 +227,12 @@ function Header({ forceLightMode = false }) {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
+    
+    // Close menu on navigation
+    setIsMenuOpen(false);
+    
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [pathname]);
 
   // ALWAYS RENDER FULL HEADER
   return (
@@ -237,7 +241,7 @@ function Header({ forceLightMode = false }) {
       style={{
         borderBottom: 'none',
         backgroundColor: isHome && !isMenuOpen && !forceLightMode ? 'transparent' : 'white',
-        zIndex: 3000,
+        zIndex: 500,
         transition: 'all 0.3s ease',
         height: '90px'
       }}
@@ -263,15 +267,18 @@ function Header({ forceLightMode = false }) {
                 <li key={it.gender}>
                   <button
                     onClick={() => {
-                      if (selectedGender === it.gender) {
-                        setIsMenuOpen(!isMenuOpen);
+                      const targetPath = it.gender === "woman" ? "/" : `/${it.gender}`;
+                      if (selectedGender === it.gender && isMenuOpen) {
+                        setIsMenuOpen(false);
                       } else {
+                        navigate(targetPath);
                         setSelectedGender(it.gender);
                         setIsMenuOpen(true);
                       }
                     }}
-                    className={`bg-transparent border-none no-underline font-light text-lg uppercase transition-all py-2 px-1 relative cursor-pointer ${isHome && !isMenuOpen && !forceLightMode ? "text-white" : "text-900"
-                      } ${isActive || isRouteActive ? "opacity-100" : "opacity-60 hover:opacity-100"}`}
+                    className={`bg-transparent border-none no-underline font-light text-lg uppercase transition-all py-2 px-1 relative cursor-pointer ${
+                      isHome && !isMenuOpen && !forceLightMode ? "text-white" : "text-black"
+                    } ${isActive || isRouteActive ? "opacity-100" : "opacity-80 hover:opacity-100"}`}
                     style={{
                       textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none',
                       borderBottom: (isActive || isRouteActive) ? (isHome && !isMenuOpen && !forceLightMode ? '2px solid white' : '2px solid black') : '2px solid transparent'
@@ -286,15 +293,21 @@ function Header({ forceLightMode = false }) {
         </nav>
 
         {/* RIGHT: ICONS */}
-        <div className={`flex-1 flex justify-content-end align-items-center gap-4 ${isHome && !isMenuOpen && !forceLightMode ? "text-white" : "text-900"}`}>
+        <div className={`flex-1 flex justify-content-end align-items-center gap-4 ${isHome && !isMenuOpen && !forceLightMode ? "text-white" : "text-black"}`}>
 
           {/* 1. Search Icon */}
-          <div className="cursor-pointer" onClick={(e) => searchPanel.current?.toggle(e)}>
+          <div className="cursor-pointer" onClick={(e) => {
+            setIsMenuOpen(false);
+            searchPanel.current?.toggle(e);
+          }}>
             <i className="pi pi-search text-xl" style={{ textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
           </div>
 
           {/* 2. Wishlist Icon */}
-          <div className="cursor-pointer relative" onClick={(e) => wishlistPanel.current?.toggle(e)}>
+          <div className="cursor-pointer relative" onClick={(e) => {
+            setIsMenuOpen(false);
+            wishlistPanel.current?.toggle(e);
+          }}>
             <i className="pi pi-heart text-xl" style={{ textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
             {wishlist.length > 0 && <Badge value={wishlist.length} severity="danger" className="absolute -top-2 -right-2" />}
           </div>
@@ -312,19 +325,25 @@ function Header({ forceLightMode = false }) {
           )}
 
           {/* 4. Cart Icon */}
-          <div className="cursor-pointer relative p-2" onClick={(e) => cartPanel.current?.toggle(e)}>
+          <div className="cursor-pointer relative p-2" onClick={(e) => {
+            setIsMenuOpen(false);
+            cartPanel.current?.toggle(e);
+          }}>
             <i className="pi pi-shopping-cart text-xl" style={{ textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
             {totalCartCount > 0 && (
-              <span className={`absolute border-circle flex align-items-center justify-content-center font-bold transition-all shadow-1 ${isHome && !isMenuOpen && !forceLightMode ? 'bg-white text-900' : 'bg-900 text-white'}`}
+              <span className="absolute border-circle flex align-items-center justify-content-center font-black transition-all"
                 style={{ 
                   top: '0', 
                   right: '0', 
-                  width: '14px', 
-                  height: '14px', 
-                  fontSize: '8px',
+                  width: '16px', 
+                  height: '16px', 
+                  fontSize: '9px',
                   lineHeight: '1',
-                  zIndex: 10,
-                  border: isHome && !isMenuOpen && !forceLightMode ? '1px solid white' : '1px solid black'
+                  zIndex: 50,
+                  backgroundColor: isHome && !isMenuOpen && !forceLightMode ? 'white' : 'black',
+                  color: isHome && !isMenuOpen && !forceLightMode ? 'black' : 'white',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                  border: 'none'
                 }}>
                 {totalCartCount}
               </span>
@@ -343,49 +362,49 @@ function Header({ forceLightMode = false }) {
           left: '0',
           top: '90px',
           border: 'none',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.08)',
           borderRadius: '0',
-          padding: '0'
+          padding: '0',
+          zIndex: 2100
         }}
         className="uq-search-panel"
       >
-        <div className="bg-white w-full py-6 flex justify-content-center">
-          <div className="container-xl w-full">
-            <div className="flex align-items-center gap-4 px-4">
-              <div className="p-input-icon-left flex-1 relative">
-                <i className="pi pi-search text-900" style={{ fontSize: '1.4rem', left: '0' }} />
+        <div className="bg-white w-full py-10 flex justify-content-center border-bottom-1 border-100">
+          <div className="container-xl w-full px-6">
+            <div className="flex align-items-center gap-6">
+              <div className="flex-1 relative">
+                <i className="pi pi-search text-gray-300" style={{ fontSize: '1.8rem', position: 'absolute', left: '0', top: '50%', transform: 'translateY(-50%)' }} />
                 <InputText
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                   placeholder="BẠN ĐANG TÌM KIẾM ĐIỀU GÌ?"
-                  className="w-full border-none border-bottom-1 border-200 border-noround text-2xl uppercase p-3 pl-6 bg-transparent focus:border-900 transition-all duration-300 font-light"
-                  style={{ letterSpacing: '2px' }}
+                  className="w-full border-none border-bottom-2 border-100 border-noround text-3xl uppercase py-4 pl-10 bg-transparent focus:border-black transition-all duration-300 font-black outline-none"
+                  style={{ letterSpacing: '0.05em' }}
                   autoFocus
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 />
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <button
-                  className="bg-black text-white px-8 py-3 font-bold uppercase border-none cursor-pointer hover:bg-gray-800 transition-all text-sm"
+                  className="bg-black text-white px-10 py-4 font-black uppercase border-none cursor-pointer hover:bg-gray-800 transition-all text-xs tracking-[0.2em]"
                   onClick={handleSearch}
                 >
                   Tìm kiếm
                 </button>
                 <button
-                  className="bg-white text-900 px-4 border-none cursor-pointer hover:text-red-500 transition-all"
+                  className="bg-white text-black w-12 h-12 flex align-items-center justify-content-center border-1 border-200 cursor-pointer hover:border-black transition-all"
                   onClick={() => searchPanel.current?.hide()}
                 >
                   <i className="pi pi-times text-xl" />
                 </button>
               </div>
             </div>
-            <div className="px-4 mt-4 flex gap-4">
-              <span className="text-xs text-500 uppercase font-bold">Gợi ý:</span>
-              <div className="flex gap-3 text-xs uppercase text-700 font-medium">
-                <span className="cursor-pointer hover:underline" onClick={() => handleSearch("Áo thun")}>Áo thun</span>
-                <span className="cursor-pointer hover:underline" onClick={() => handleSearch("Jeans")}>Jeans</span>
-                <span className="cursor-pointer hover:underline" onClick={() => handleSearch("Heattech")}>Heattech</span>
-                <span className="cursor-pointer hover:underline" onClick={() => handleSearch("Airism")}>Airism</span>
+            <div className="mt-8 flex align-items-center gap-6">
+              <span className="text-[10px] text-gray-400 uppercase font-black tracking-[0.2em]">Tìm kiếm phổ biến:</span>
+              <div className="flex gap-5 text-[11px] uppercase text-gray-800 font-bold tracking-wider">
+                {["Áo thun", "Jeans", "Heattech", "Airism", "UV Cut"].map(term => (
+                  <span key={term} className="cursor-pointer hover:text-red-600 transition-colors border-bottom-1 border-transparent hover:border-red-600 pb-1" onClick={() => handleSearch(term)}>{term}</span>
+                ))}
               </div>
             </div>
           </div>
@@ -393,33 +412,45 @@ function Header({ forceLightMode = false }) {
       </OverlayPanel>
 
       {/* WISHLIST OVERLAY */}
-      <OverlayPanel ref={wishlistPanel} dismissable style={{ width: '320px', borderRadius: '0', border: '1px solid #eee' }}>
-        <div className="p-0">
-          <div className="p-3 border-bottom-1 border-100 flex justify-content-between align-items-center">
-            <h4 className="m-0 font-bold uppercase text-xs tracking-wider">Danh sách yêu thích ({wishlist.length})</h4>
-            <Link to="/wishlist" className="text-xs font-bold text-blue-600 no-underline hover:underline" onClick={() => wishlistPanel.current?.hide()}>Xem tất cả</Link>
+      <OverlayPanel 
+        ref={wishlistPanel} 
+        dismissable 
+        style={{ 
+          width: '380px', 
+          borderRadius: '8px', 
+          border: '1px solid #eee', 
+          boxShadow: '0 15px 50px rgba(0,0,0,0.12)',
+          padding: '0',
+          overflow: 'hidden',
+          zIndex: 2000
+        }}
+      >
+        <div className="flex flex-column">
+          <div className="p-4 border-bottom-1 border-100 flex justify-content-between align-items-center bg-gray-50/50">
+            <h4 className="m-0 font-black uppercase text-[10px] tracking-[0.2em] text-gray-500">Yêu thích ({wishlist.length})</h4>
+            <Link to="/wishlist" className="text-[10px] font-black text-black uppercase no-underline hover:underline tracking-widest" onClick={() => wishlistPanel.current?.hide()}>Xem tất cả</Link>
           </div>
-          <div className="max-h-24rem overflow-y-auto">
+          <div className="max-h-[500px] overflow-y-auto">
             {wishlist.length === 0 ? (
-              <div className="p-5 text-center flex flex-column align-items-center gap-2">
-                <i className="pi pi-heart text-200 text-4xl"></i>
-                <p className="text-500 m-0 text-xs uppercase tracking-tight">Chưa có sản phẩm nào</p>
+              <div className="py-12 px-6 text-center flex flex-column align-items-center gap-3">
+                <i className="pi pi-heart text-gray-100 text-6xl"></i>
+                <p className="text-gray-400 m-0 text-xs font-bold uppercase tracking-widest leading-relaxed">Bạn chưa có sản phẩm nào<br/>trong danh sách yêu thích</p>
               </div>
             ) : (
               wishlist.map((p) => (
-                <div key={p.id} className="flex gap-3 p-3 border-bottom-1 border-50 hover:bg-gray-50 transition-all group relative cursor-pointer" onClick={() => { navigate(`/products/${p.id}`); wishlistPanel.current?.hide(); }}>
-                  <div className="w-4rem h-4rem flex-shrink-0 overflow-hidden border-round-sm border-1 border-50">
+                <div key={p.id} className="flex gap-4 p-4 border-bottom-1 border-50 hover:bg-gray-50 transition-all group relative cursor-pointer" onClick={() => { navigate(`/product/${p.id}`); wishlistPanel.current?.hide(); }}>
+                  <div className="w-20 h-24 flex-shrink-0 overflow-hidden bg-gray-100 border-round">
                     <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
                   </div>
-                  <div className="flex flex-column justify-content-between flex-1 min-w-0">
-                    <div className="pr-4">
-                      <span className="font-bold text-xs uppercase block text-overflow-ellipsis overflow-hidden white-space-nowrap">{p.name}</span>
-                      <span className="text-500 text-xs block mt-1">{p.brand}</span>
+                  <div className="flex flex-column justify-content-between flex-1 min-w-0 py-1">
+                    <div>
+                      <span className="font-black text-xs uppercase block truncate pr-6 tracking-tight text-gray-800">{p.name}</span>
+                      <span className="text-[10px] font-bold text-gray-400 block mt-1 uppercase tracking-widest">{p.brand}</span>
                     </div>
-                    <span className="text-900 font-bold text-sm">{(p.price || 0).toLocaleString("vi-VN")}₫</span>
+                    <span className="text-black font-black text-sm">{(p.price || 0).toLocaleString("vi-VN")}₫</span>
                   </div>
                   <button
-                    className="absolute top-0 right-0 p-3 text-300 hover:text-red-500 transition-colors border-none bg-transparent cursor-pointer opacity-0 group-hover:opacity-100"
+                    className="absolute top-2 right-2 p-2 text-gray-200 hover:text-red-500 transition-all border-none bg-transparent cursor-pointer opacity-0 group-hover:opacity-100"
                     onClick={(e) => handleRemoveFromWishlist(e, p.id)}
                   >
                     <i className="pi pi-trash text-sm"></i>
@@ -433,17 +464,29 @@ function Header({ forceLightMode = false }) {
 
 
       {/* CART OVERLAY */}
-      <OverlayPanel ref={cartPanel} dismissable style={{ width: '350px', borderRadius: '0', border: '1px solid #eee' }}>
-        <div className="p-0">
-          <div className="p-3 border-bottom-1 border-100 flex justify-content-between align-items-center">
-            <h4 className="m-0 font-bold uppercase text-xs tracking-wider">Giỏ hàng ({totalCartCount})</h4>
-            <Link to="/cart" className="text-xs font-bold text-blue-600 no-underline hover:underline" onClick={() => cartPanel.current?.hide()}>Chi tiết giỏ hàng</Link>
+      <OverlayPanel 
+        ref={cartPanel} 
+        dismissable 
+        style={{ 
+          width: '400px', 
+          borderRadius: '8px', 
+          border: '1px solid #eee', 
+          boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+          padding: '0',
+          overflow: 'hidden',
+          zIndex: 2000
+        }}
+      >
+        <div className="flex flex-column">
+          <div className="p-4 border-bottom-1 border-100 flex justify-content-between align-items-center bg-gray-50/50">
+            <h4 className="m-0 font-black uppercase text-[10px] tracking-[0.2em] text-gray-500">Giỏ hàng ({totalCartCount})</h4>
+            <Link to="/cart" className="text-[10px] font-black text-black uppercase no-underline hover:underline tracking-widest" onClick={() => cartPanel.current?.hide()}>Xem giỏ hàng</Link>
           </div>
-          <div className="max-h-24rem overflow-y-auto">
+          <div className="max-h-[500px] overflow-y-auto">
             {cartItems.length === 0 ? (
-              <div className="p-5 text-center flex flex-column align-items-center gap-2">
-                <i className="pi pi-shopping-cart text-200 text-4xl"></i>
-                <p className="text-500 m-0 text-xs uppercase tracking-tight">Giỏ hàng trống</p>
+              <div className="py-12 px-6 text-center flex flex-column align-items-center gap-3">
+                <i className="pi pi-shopping-cart text-gray-100 text-6xl"></i>
+                <p className="text-gray-400 m-0 text-xs font-bold uppercase tracking-widest">Giỏ hàng của bạn đang trống</p>
               </div>
             ) : (
               cartItems.map((item) => {
@@ -453,25 +496,27 @@ function Header({ forceLightMode = false }) {
                 const variantName = item.variantName || (product.variants?.find(v => v._id === item.variantId)?.name);
 
                 return (
-                  <div key={item._id || productId} className="flex gap-3 p-3 border-bottom-1 border-50 hover:bg-gray-50 transition-all group relative cursor-pointer" onClick={() => { navigate(`/products/${productId}`); cartPanel.current?.hide(); }}>
-                    <div className="w-4rem h-5rem flex-shrink-0 overflow-hidden border-round-sm border-1 border-50">
+                  <div key={item._id || `${productId}-${item.variantId}-${item.color}`} className="flex gap-4 p-4 border-bottom-1 border-50 hover:bg-gray-50 transition-all group relative cursor-pointer" onClick={() => { navigate(`/product/${productId}`); cartPanel.current?.hide(); }}>
+                    <div className="w-20 h-28 flex-shrink-0 overflow-hidden bg-gray-100 border-round">
                       <img src={product.images?.[0] || "/img/default.png"} alt={product.name} className="w-full h-full object-cover" />
                     </div>
-                    <div className="flex flex-column justify-content-between flex-1 min-w-0">
+                    <div className="flex flex-column justify-content-between flex-1 min-w-0 py-1">
                       <div>
-                        <span className="font-bold text-xs uppercase block text-overflow-ellipsis overflow-hidden white-space-nowrap pr-4">{product.name}</span>
-                        <div className="flex gap-2 mt-1 text-xs text-500">
-                          {variantName && <span>Size: {variantName}</span>}
-                          {item.color && <span>Màu: {item.color}</span>}
+                        <span className="font-black text-xs uppercase block truncate pr-6 tracking-tight text-gray-800">{product.name}</span>
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1">
+                          {variantName && <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Size: {variantName}</span>}
+                          {item.color && <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Color: {item.color}</span>}
                         </div>
                       </div>
-                      <div className="flex justify-content-between align-items-center mt-2">
-                        <span className="text-xs font-medium text-600">Số lượng: {item.quantity}</span>
-                        <span className="text-900 font-bold text-sm">{(item.price || product.price || 0).toLocaleString("vi-VN")}₫</span>
+                      <div className="flex justify-content-between align-items-end">
+                        <div className="flex align-items-center gap-2 bg-gray-100 px-2 py-1 border-round text-[10px] font-black">
+                          QTY: {item.quantity}
+                        </div>
+                        <span className="text-black font-black text-sm">{(item.price || product.price || 0).toLocaleString("vi-VN")}₫</span>
                       </div>
                     </div>
                     <button
-                      className="absolute top-0 right-0 p-3 text-300 hover:text-red-500 transition-colors border-none bg-transparent cursor-pointer opacity-0 group-hover:opacity-100"
+                      className="absolute top-2 right-2 p-2 text-gray-200 hover:text-red-500 transition-all border-none bg-transparent cursor-pointer opacity-0 group-hover:opacity-100"
                       onClick={(e) => handleRemoveFromCart(e, productId, item.variantId, item.color)}
                     >
                       <i className="pi pi-trash text-sm"></i>
@@ -482,16 +527,16 @@ function Header({ forceLightMode = false }) {
             )}
           </div>
           {cartItems.length > 0 && (
-            <div className="p-3 bg-gray-50">
-              <div className="flex justify-content-between mb-3">
-                <span className="text-xs font-bold uppercase text-600">Tổng cộng:</span>
-                <span className="text-900 font-bold text-lg">{totalCartPrice.toLocaleString("vi-VN")}₫</span>
+            <div className="p-5 bg-white border-top-1 border-100">
+              <div className="flex justify-content-between align-items-center mb-5">
+                <span className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em]">Tổng cộng:</span>
+                <span className="text-black font-black text-2xl tracking-tighter">{totalCartPrice.toLocaleString("vi-VN")}₫</span>
               </div>
               <button
-                className="w-full bg-black text-white py-3 font-bold uppercase border-none cursor-pointer hover:bg-gray-800 transition-all text-sm tracking-widest"
+                className="w-full bg-black text-white py-4 font-black uppercase border-none cursor-pointer hover:bg-gray-800 transition-all text-xs tracking-[0.25em] shadow-lg shadow-black/10"
                 onClick={() => { navigate("/checkout"); cartPanel.current?.hide(); }}
               >
-                Thanh toán
+                Thanh toán ngay
               </button>
             </div>
           )}
@@ -501,30 +546,30 @@ function Header({ forceLightMode = false }) {
       {/* CUSTOM MEGA MENU */}
       <div
         ref={menuRef}
-        className={`fixed left-0 w-full bg-white shadow-8 overflow-hidden transition-all duration-800 ease-in-out ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed left-0 w-full bg-white shadow-8 overflow-hidden transition-all duration-500 ease-in-out ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         style={{
           top: '90px',
           zIndex: 1000,
-          maxHeight: isMenuOpen ? '65vh' : '0',
-          transform: isMenuOpen ? 'translateY(0)' : 'translateY(-10px)',
-          transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
+          maxHeight: isMenuOpen ? '75vh' : '0',
+          transform: isMenuOpen ? 'translateY(0)' : 'translateY(-20px)',
+          transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
         }}
       >
-        <div className="bg-white relative flex flex-column" style={{ maxHeight: '65vh' }}>
+        <div className="bg-white relative flex flex-column h-full" style={{ maxHeight: '75vh' }}>
           <button
-            className="absolute top-0 right-0 p-4 border-none bg-transparent cursor-pointer hover:text-red-600 transition-colors z-10"
+            className="absolute top-2 right-4 p-4 border-none bg-transparent cursor-pointer hover:text-red-600 transition-colors z-20"
             onClick={() => setIsMenuOpen(false)}
           >
             <i className="pi pi-times text-2xl"></i>
           </button>
 
-          <div className="flex flex-column align-items-center justify-content-center p-4 border-bottom-1 border-100 bg-gray-50 flex-shrink-0">
-            <div className="p-input-icon-left w-full" style={{ maxWidth: '700px' }}>
-              <i className="pi pi-search text-900" style={{ fontSize: '1.2rem', left: '0' }} />
+          <div className="flex flex-column align-items-center justify-content-center pt-10 pb-6 border-bottom-1 border-100 flex-shrink-0">
+            <div className="p-input-icon-left w-full px-6" style={{ maxWidth: '800px' }}>
+              <i className="pi pi-search text-gray-300" style={{ fontSize: '1.4rem', left: '2rem' }} />
               <InputText
                 placeholder={segmentsData[selectedGender]?.searchPlaceholder?.toUpperCase()}
-                className="w-full border-none border-bottom-1 border-400 border-noround text-xl bg-transparent p-3 pl-6 uppercase font-light focus:border-900 transition-all font-bold"
-                style={{ letterSpacing: '1px' }}
+                className="w-full border-none border-bottom-2 border-100 border-noround text-2xl bg-transparent py-4 pl-12 uppercase font-black focus:border-black transition-all outline-none"
+                style={{ letterSpacing: '0.02em' }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     navigate(`/search?gender=${selectedGender}&q=${encodeURIComponent(e.target.value)}`);
@@ -533,23 +578,23 @@ function Header({ forceLightMode = false }) {
                 }}
               />
             </div>
-            <div className="flex gap-3 mt-3">
-              <span className="text-xs text-500 uppercase">Tìm kiếm phổ biến:</span>
-              <span className="text-xs font-bold cursor-pointer hover:text-red-600" onClick={() => handleSearch("Áo Polo")}>Áo Polo</span>
-              <span className="text-xs font-bold cursor-pointer hover:text-red-600" onClick={() => handleSearch("Quần Smart Pants")}>Quần Smart Pants</span>
-              <span className="text-xs font-bold cursor-pointer hover:text-red-600" onClick={() => handleSearch("Đồ lót Airism")}>Đồ lót Airism</span>
+            <div className="flex gap-4 mt-6">
+              <span className="text-[10px] text-gray-400 uppercase font-black tracking-[0.2em]">Xu hướng:</span>
+              {["Áo Polo", "Smart Pants", "Airism Inner", "LifeWear", "Collab"].map(tag => (
+                <span key={tag} className="text-[10px] font-black cursor-pointer hover:text-red-600 transition-colors uppercase tracking-widest text-gray-600" onClick={() => handleSearch(tag)}>{tag}</span>
+              ))}
             </div>
           </div>
 
-          <div className="p-4 overflow-y-auto" style={{ maxHeight: '60vh' }}>
+          <div className="p-8 overflow-y-auto" style={{ maxHeight: '60vh' }}>
             <div className="grid m-0">
               {segmentsData[selectedGender]?.categories.map((cat, idx) => (
-                <div key={idx} className="col-3 p-3 hover:bg-gray-100 cursor-pointer transition-colors border-round" onClick={() => {
+                <div key={idx} className="col-3 p-4 hover:bg-gray-50 cursor-pointer transition-all border-round group" onClick={() => {
                   navigate(`/search?gender=${selectedGender}&sub=${encodeURIComponent(cat.title)}`);
                   setIsMenuOpen(false);
                 }}>
-                  <div className="flex align-items-center gap-3">
-                    <div className="w-5rem h-5rem overflow-hidden bg-gray-200 flex-shrink-0">
+                  <div className="flex align-items-center gap-5">
+                    <div className="w-24 h-24 overflow-hidden bg-gray-100 flex-shrink-0 border-round transition-transform group-hover:scale-105 duration-500">
                       <img
                         src={cat.img}
                         alt={cat.title}
@@ -557,9 +602,9 @@ function Header({ forceLightMode = false }) {
                         onError={(e) => e.target.src = "/logo.png"}
                       />
                     </div>
-                    <div className="flex flex-column">
-                      <span className="font-bold text-sm text-900 uppercase">{cat.title}</span>
-                      <span className="text-xs text-500">{cat.desc}</span>
+                    <div className="flex flex-column gap-1">
+                      <span className="font-black text-xs text-black uppercase tracking-tight group-hover:text-red-600 transition-colors">{cat.title}</span>
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{cat.desc}</span>
                     </div>
                   </div>
                 </div>
