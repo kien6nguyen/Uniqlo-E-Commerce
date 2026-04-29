@@ -209,8 +209,8 @@ const ProductDetail = () => {
                 )}
               </div>
 
-              <p className="text-gray-600 text-sm leading-relaxed mb-10 border-left-3 border-gray-100 pl-5 italic font-medium">
-                {product.description}
+              <p className="text-gray-500 text-sm leading-relaxed mb-10 border-left-2 border-gray-100 pl-6 font-medium">
+                {product.description || "Một sản phẩm chất lượng cao từ Uniqlo LifeWear, mang lại sự thoải mái và phong cách vượt trội cho người mặc."}
               </p>
 
               {/* Color Selection */}
@@ -219,14 +219,15 @@ const ProductDetail = () => {
                   <div className="flex justify-content-between align-items-center mb-3">
                     <span className="text-[11px] font-black text-[#111] tracking-widest uppercase">Màu sắc: <span className="text-gray-400 ml-1">{selectedColor}</span></span>
                   </div>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-wrap gap-4">
                     {product.tags.map(color => (
                       <div 
                         key={color}
                         onClick={() => setSelectedColor(color)}
-                        className={`w-12 h-12 rounded-sm cursor-pointer border-2 transition-all p-1 flex align-items-center justify-content-center ${selectedColor === color ? 'border-black shadow-md' : 'border-gray-200 hover:border-gray-400'}`}
+                        className={`border-circle cursor-pointer border-2 transition-all duration-300 p-1 flex align-items-center justify-content-center ${selectedColor === color ? 'border-gray-900 shadow-4' : 'border-300 hover:border-600'}`}
+                        style={{ width: '48px', height: '48px', transform: selectedColor === color ? 'scale(1.1)' : 'scale(1)' }}
                       >
-                        <div className="w-full h-full rounded-sm shadow-inner" style={{ backgroundColor: color.toLowerCase(), border: '1px solid rgba(0,0,0,0.05)' }}></div>
+                        <div className="w-full h-full border-circle" style={{ backgroundColor: color.toLowerCase(), border: '1px solid rgba(0,0,0,0.1)', boxShadow: 'inset 0 2px 4px 0 rgba(0,0,0,0.06)' }}></div>
                       </div>
                     ))}
                   </div>
@@ -240,12 +241,18 @@ const ProductDetail = () => {
                     <span className="text-[11px] font-black text-[#111] tracking-widest uppercase">Kích thước</span>
                     <span className="text-[10px] font-bold text-blue-600 cursor-pointer hover:underline uppercase">Hướng dẫn chọn size</span>
                   </div>
-                  <div className="grid grid-nogutter gap-2">
+                  <div className="grid grid-nogutter" style={{ gap: '12px' }}>
                     {product.variants.map(v => (
                       <div key={v._id} className="col">
                         <button 
                           onClick={() => setSelectedConfig(v._id)}
-                          className={`w-full py-4 text-xs font-black border-2 transition-all rounded-sm uppercase tracking-widest ${selectedConfig === v._id ? 'bg-black text-white border-black shadow-lg translate-y-[-2px]' : 'bg-white text-black border-gray-200 hover:bg-gray-100'}`}
+                          className="w-full p-3 text-xs font-bold border-1 transition-all border-round uppercase cursor-pointer"
+                          style={{
+                            backgroundColor: selectedConfig === v._id ? '#111' : '#fff',
+                            color: selectedConfig === v._id ? '#fff' : '#111',
+                            borderColor: selectedConfig === v._id ? '#111' : '#e5e7eb',
+                            letterSpacing: '0.1em'
+                          }}
                         >
                           {v.name}
                         </button>
@@ -264,15 +271,16 @@ const ProductDetail = () => {
               </div>
 
               {/* Actions */}
-              <div className="flex flex-column gap-3 mb-10">
+              <div className="flex flex-column gap-4 mb-10">
                 <button 
                   disabled={currentStock <= 0}
                   onClick={addToCart}
-                  className={`w-full py-5 text-sm font-black uppercase tracking-[0.25em] transition-all border-none active:scale-95 shadow-xl shadow-black/5 ${currentStock > 0 ? 'bg-black text-white cursor-pointer hover:bg-gray-800' : 'bg-gray-100 text-gray-300 cursor-not-allowed'}`}
+                  className={`w-full p-4 text-sm font-bold uppercase transition-all border-none border-round cursor-pointer shadow-2 ${currentStock > 0 ? 'bg-gray-900 text-white hover:bg-gray-800' : 'surface-200 text-500 cursor-not-allowed'}`}
+                  style={{ letterSpacing: '0.2em' }}
                 >
-                  Thêm vào túi đồ
+                  {currentStock > 0 ? "Thêm vào túi đồ" : "Hết hàng"}
                 </button>
-                <div className="flex gap-3">
+                <div className="flex gap-4">
                   <button 
                     onClick={async () => {
                       if (!product) return;
@@ -302,9 +310,10 @@ const ProductDetail = () => {
                         toast.current.show({ severity: "success", summary: "Thành công", detail: "Đã thêm vào yêu thích", life: 2000 });
                       } catch (err) { console.error(err); }
                     }}
-                    className="flex-1 py-4 text-[10px] font-black border-1 border-black rounded-sm uppercase bg-white text-black hover:bg-gray-50 transition-all flex align-items-center justify-content-center gap-2 tracking-[0.2em] cursor-pointer"
+                    className="flex-1 p-3 font-bold border-1 border-300 border-round uppercase surface-0 text-700 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all flex align-items-center justify-content-center gap-2 cursor-pointer"
+                    style={{ fontSize: '10px', letterSpacing: '0.2em' }}
                   >
-                    <i className="pi pi-heart"></i> Yêu thích
+                    <i className="pi pi-heart-fill"></i> Yêu thích
                   </button>
                   <button 
                     onClick={() => {
@@ -315,7 +324,8 @@ const ProductDetail = () => {
                           toast.current.show({ severity: "info", summary: "Copy", detail: "Đã copy link sản phẩm", life: 2000 });
                         }
                     }}
-                    className="flex-1 py-4 text-[10px] font-black border-1 border-gray-200 rounded-sm uppercase bg-white text-gray-400 hover:text-black hover:border-black transition-all flex align-items-center justify-content-center gap-2 tracking-[0.2em] cursor-pointer"
+                    className="flex-1 p-3 font-bold border-1 border-300 border-round uppercase surface-0 text-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all flex align-items-center justify-content-center gap-2 cursor-pointer"
+                    style={{ fontSize: '10px', letterSpacing: '0.2em' }}
                   >
                     <i className="pi pi-share-alt"></i> Chia sẻ
                   </button>
@@ -323,23 +333,23 @@ const ProductDetail = () => {
               </div>
 
               {/* Extra Info */}
-              <div className="border-top-1 border-gray-100 pt-6 flex flex-column gap-4">
-                <div className="flex align-items-start gap-4">
-                  <div className="w-8 h-8 bg-gray-50 border-circle flex align-items-center justify-content-center flex-shrink-0">
-                    <i className="pi pi-truck text-black text-xs"></i>
+              <div className="border-top-1 surface-border pt-5 flex flex-column gap-4">
+                <div className="flex align-items-center gap-4">
+                  <div className="surface-100 border-circle flex align-items-center justify-content-center flex-shrink-0" style={{ width: '48px', height: '48px' }}>
+                    <i className="pi pi-truck text-gray-800 text-xl"></i>
                   </div>
                   <div>
-                    <p className="m-0 text-[10px] font-black uppercase text-[#111] mb-1 tracking-widest">Giao hàng miễn phí</p>
-                    <p className="m-0 text-[11px] text-gray-400 leading-normal font-bold">Miễn phí cho đơn hàng trên 999.000₫</p>
+                    <p className="m-0 text-xs font-bold uppercase text-gray-900 mb-1" style={{ letterSpacing: '0.1em' }}>Giao hàng miễn phí</p>
+                    <p className="m-0 text-xs text-gray-600 font-medium">Miễn phí cho đơn hàng trên 999.000₫</p>
                   </div>
                 </div>
-                <div className="flex align-items-start gap-4">
-                  <div className="w-8 h-8 bg-gray-50 border-circle flex align-items-center justify-content-center flex-shrink-0">
-                    <i className="pi pi-refresh text-black text-xs"></i>
+                <div className="flex align-items-center gap-4">
+                  <div className="surface-100 border-circle flex align-items-center justify-content-center flex-shrink-0" style={{ width: '48px', height: '48px' }}>
+                    <i className="pi pi-refresh text-gray-800 text-xl"></i>
                   </div>
                   <div>
-                    <p className="m-0 text-[10px] font-black uppercase text-[#111] mb-1 tracking-widest">Đổi trả trong 30 ngày</p>
-                    <p className="m-0 text-[11px] text-gray-400 leading-normal font-bold">An tâm mua sắm với chính sách đổi trả</p>
+                    <p className="m-0 text-xs font-bold uppercase text-gray-900 mb-1" style={{ letterSpacing: '0.1em' }}>Đổi trả trong 30 ngày</p>
+                    <p className="m-0 text-xs text-gray-600 font-medium">An tâm mua sắm với chính sách đổi trả</p>
                   </div>
                 </div>
               </div>
@@ -349,56 +359,62 @@ const ProductDetail = () => {
       </main>
 
       {/* Reviews Section */}
-      <section className="bg-white py-24 border-top-1 border-gray-100">
+      <section className="bg-white py-8 border-top-1 surface-border">
         <div className="max-w-screen-xl mx-auto px-4">
-          <div className="flex justify-content-between align-items-end mb-12 pb-4 border-bottom-2 border-black">
-            <h2 className="m-0 text-2xl font-black uppercase tracking-tighter">Đánh giá thực tế</h2>
-            <div className="flex align-items-center gap-2 text-gray-400">
-                <span className="text-[10px] font-black uppercase tracking-widest">{comments.length} đánh giá</span>
+          <div className="flex justify-content-between align-items-end mb-6 pb-4 border-bottom-2 border-900">
+            <h2 className="m-0 text-2xl font-bold uppercase tracking-tight text-900">Đánh giá từ khách hàng</h2>
+            <div className="flex align-items-center gap-2 text-600">
+                <span className="text-xs font-bold uppercase tracking-widest">{comments.length} đánh giá</span>
             </div>
           </div>
           
           <div className="grid">
-            <div className="col-12 md:col-4 mb-12 md:mb-0 pr-0 md:pr-12">
-              <div className="bg-gray-50 p-8 rounded-2xl text-center">
-                <div className="text-7xl font-black text-black mb-2 tracking-tighter">{product.averageRating || 5.0}</div>
-                <div className="flex justify-content-center mb-4">
-                   <Rating value={Math.round(product.averageRating || 5)} readOnly stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-400 text-xl' }, offIcon: { className: 'text-gray-200 text-xl' } }} />
+            <div className="col-12 md:col-4 mb-6 md:mb-0 pr-0 md:pr-6">
+              <div className="surface-50 p-5 border-round-xl text-center">
+                <div className="text-6xl font-black text-900 mb-2">{product.averageRating || 5.0}</div>
+                <div className="flex justify-content-center mb-3">
+                   <Rating value={Math.round(product.averageRating || 5)} readOnly stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-500 text-lg' }, offIcon: { className: 'text-300 text-lg' } }} />
                 </div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Đánh giá trung bình</p>
-                <button className="w-full bg-white border-1 border-black py-3 text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all cursor-pointer">Viết đánh giá của bạn</button>
+                <p className="text-xs font-bold text-600 uppercase mb-5" style={{ letterSpacing: '0.1em' }}>Đánh giá trung bình</p>
+                <button className="w-full surface-0 border-1 border-900 p-3 text-xs font-bold uppercase transition-all cursor-pointer hover:bg-gray-900 hover:text-white" style={{ letterSpacing: '0.1em' }}>
+                  Viết đánh giá
+                </button>
               </div>
             </div>
             
             <div className="col-12 md:col-8">
               {comments.length > 0 ? (
-                <div className="flex flex-column gap-8">
+                <div className="flex flex-column">
                   {comments.map((c, i) => (
-                    <div key={i} className="pb-8 border-bottom-1 border-gray-100 last:border-none">
-                      <div className="flex justify-content-between align-items-center mb-4">
+                    <div key={i} className="py-5 border-bottom-1 surface-border last:border-none">
+                      <div className="flex justify-content-between align-items-start mb-3">
                         <div className="flex align-items-center gap-3">
-                            <div className="w-10 h-10 bg-black text-white border-circle flex align-items-center justify-content-center font-black text-xs">
+                            <div className="surface-200 text-700 border-circle flex align-items-center justify-content-center font-bold text-sm" style={{ width: '40px', height: '40px' }}>
                                 {c.user?.fullname?.charAt(0) || "U"}
                             </div>
-                            <div className="flex flex-column">
-                                <span className="font-black text-[11px] uppercase tracking-wider">{c.user?.fullname || "Khách hàng Uniqlo"}</span>
-                                <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">{new Date(c.createdAt || Date.now()).toLocaleDateString("vi-VN")}</span>
+                            <div className="flex flex-column gap-1">
+                                <span className="font-bold text-sm text-900">{c.user?.fullname || "Khách hàng Uniqlo"}</span>
+                                <span className="text-xs text-500">{new Date(c.createdAt || Date.now()).toLocaleDateString("vi-VN")}</span>
                             </div>
                         </div>
-                        <Rating value={c.rating} readOnly stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-400 text-[10px]' }, offIcon: { className: 'text-gray-200 text-[10px]' } }} />
+                        <Rating value={c.rating} readOnly stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-500 text-sm' }, offIcon: { className: 'text-300 text-sm' } }} />
                       </div>
-                      <p className="m-0 text-sm text-gray-700 leading-relaxed font-bold">"{c.comment}"</p>
+                      <p className="m-0 text-sm text-800 line-height-3">"{c.comment}"</p>
                       <div className="mt-4 flex gap-4">
-                        <span className="text-[9px] font-black uppercase tracking-widest text-gray-300 cursor-pointer hover:text-black">Hữu ích (0)</span>
-                        <span className="text-[9px] font-black uppercase tracking-widest text-gray-300 cursor-pointer hover:text-black">Báo cáo</span>
+                        <span className="text-xs font-medium text-500 cursor-pointer hover:text-900 transition-colors flex align-items-center gap-2">
+                          <i className="pi pi-thumbs-up"></i> Hữu ích (0)
+                        </span>
+                        <span className="text-xs font-medium text-500 cursor-pointer hover:text-900 transition-colors flex align-items-center gap-2">
+                          <i className="pi pi-flag"></i> Báo cáo
+                        </span>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-20 bg-gray-50 border-round-xl">
-                  <i className="pi pi-comments text-gray-200 text-5xl mb-4"></i>
-                  <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em]">Hãy là người đầu tiên đánh giá sản phẩm này</p>
+                <div className="text-center py-8 surface-50 border-round-xl">
+                  <i className="pi pi-comments text-300 text-5xl mb-3"></i>
+                  <p className="text-500 text-sm font-medium">Chưa có đánh giá nào cho sản phẩm này.</p>
                 </div>
               )}
             </div>

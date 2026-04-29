@@ -22,17 +22,23 @@ function Header({ forceLightMode = false }) {
   const wishlistPanel = useRef(null);
   const cartPanel = useRef(null);
   const searchPanel = useRef(null);
+  const profilePanel = useRef(null);
   const [selectedGender, setSelectedGender] = useState("woman");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
   // Sync selectedGender with current path
   useEffect(() => {
-    const pathKey = pathname === "/" ? "woman" : pathname.replace("/", "");
-    if (["woman", "man", "kid", "baby"].includes(pathKey)) {
-      setSelectedGender(pathKey);
+    const genderParam = urlParams.get("gender");
+    if (genderParam && ["woman", "man", "kid", "baby"].includes(genderParam)) {
+      setSelectedGender(genderParam);
+    } else {
+      const pathKey = pathname === "/" ? "woman" : pathname.replace("/", "");
+      if (["woman", "man", "kid", "baby"].includes(pathKey)) {
+        setSelectedGender(pathKey);
+      }
     }
-  }, [pathname]);
+  }, [pathname, urlParams]);
 
 
   const processWishlistData = (wishlistData) => {
@@ -140,6 +146,16 @@ function Header({ forceLightMode = false }) {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    setWishlist([]);
+    setCartItems([]);
+    navigate("/login");
+    profilePanel.current?.hide();
+  };
+
 
   const menuItems = useMemo(
     () => [
@@ -208,12 +224,32 @@ function Header({ forceLightMode = false }) {
     "kid": {
       label: "TRẺ EM",
       searchPlaceholder: "Tìm kiếm sản phẩm trẻ em",
-      categories: Array(20).fill({ title: "Đồ Trẻ Em", desc: "Chất lượng an toàn", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids.jpg" })
+      categories: [
+        { title: "Áo thun UT", desc: "Họa tiết năng động", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-ut.jpg" },
+        { title: "Áo khoác", desc: "Ấm áp đến trường", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-outer.jpg" },
+        { title: "Quần dài", desc: "Co giãn thoải mái", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-bottoms.jpg" },
+        { title: "Đồ mặc nhà", desc: "Cotton mềm mại", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-loungewear.jpg" },
+        { title: "Áo sơ mi", desc: "Thanh lịch cho bé", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-shirt.jpg" },
+        { title: "Váy & Đầm", desc: "Dễ thương", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-dress.jpg" },
+        { title: "Đồ lót", desc: "Thấm hút tốt", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-inner.jpg" },
+        { title: "Phụ kiện", desc: "Mũ & Tất", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-accessories.jpg" },
+        { title: "Heattech", desc: "Giữ ấm mùa đông", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-heattech.jpg" },
+        { title: "Airism", desc: "Khô thoáng ngày hè", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-airism.jpg" }
+      ]
     },
     "baby": {
       label: "EM BÉ",
       searchPlaceholder: "Tìm kiếm sản phẩm em bé",
-      categories: Array(20).fill({ title: "Đồ Em Bé", desc: "Siêu mềm mại", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby.jpg" })
+      categories: [
+        { title: "Đồ sơ sinh", desc: "Cotton 100%", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby-newborn.jpg" },
+        { title: "Bodysuit", desc: "Tiện dụng cho bé", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby-bodysuit.jpg" },
+        { title: "Áo khoác", desc: "Che chắn nhẹ nhàng", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby-outer.jpg" },
+        { title: "Quần bé trai", desc: "Năng động", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby-bottoms.jpg" },
+        { title: "Váy bé gái", desc: "Xinh xắn", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby-dress.jpg" },
+        { title: "Yếm & Phụ kiện", desc: "Cần thiết cho bé", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby-accessories.jpg" },
+        { title: "Đồ ngủ", desc: "Giấc ngủ ngon", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby-loungewear.jpg" },
+        { title: "Heattech Baby", desc: "Bảo vệ bé", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby-heattech.jpg" }
+      ]
     }
   };
 
@@ -227,9 +263,6 @@ function Header({ forceLightMode = false }) {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    
-    // Close menu on navigation
-    setIsMenuOpen(false);
     
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [pathname]);
@@ -250,7 +283,7 @@ function Header({ forceLightMode = false }) {
 
         {/* LEFT: LOGO */}
         <div className="flex-1">
-          <Link to="/" className="no-underline">
+          <Link to="/" className="no-underline" onClick={() => setIsMenuOpen(false)}>
             <img src="/logo2.png" alt="Logo" style={{ height: '50px' }} />
           </Link>
         </div>
@@ -314,12 +347,23 @@ function Header({ forceLightMode = false }) {
 
           {/* 3. Profile Icon */}
           {user ? (
-            <div className="relative group cursor-pointer flex align-items-center gap-2" onClick={() => navigate("/profile")}>
-              <i className="pi pi-user text-xl" style={{ textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
-              <span className="text-xs font-normal hidden md:block uppercase" style={{ textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}>{user.fullname?.split(' ')[0]}</span>
+            <div className="relative group cursor-pointer flex align-items-center gap-2" onClick={(e) => {
+              setIsMenuOpen(false);
+              navigate("/profile");
+            }}>
+              <div className="flex align-items-center justify-content-center overflow-hidden border-1 border-200" style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#f3f4f6' }}>
+                {user.avatar ? (
+                  <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <i className="pi pi-user text-sm" style={{ color: isHome && !isMenuOpen && !forceLightMode ? 'white' : 'black' }}></i>
+                )}
+              </div>
+              <span className="text-[10px] font-black hidden md:block uppercase tracking-wider" style={{ textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}>
+                {user.fullname?.split(' ')[0]}
+              </span>
             </div>
           ) : (
-            <Link to="/login" className="no-underline flex align-items-center" style={{ color: 'inherit' }}>
+            <Link to="/login" className="no-underline flex align-items-center" style={{ color: 'inherit' }} onClick={() => setIsMenuOpen(false)}>
               <i className="pi pi-user text-xl" style={{ textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
             </Link>
           )}
@@ -369,9 +413,9 @@ function Header({ forceLightMode = false }) {
         }}
         className="uq-search-panel"
       >
-        <div className="bg-white w-full py-10 flex justify-content-center border-bottom-1 border-100">
+        <div className="bg-white w-full flex justify-content-center border-bottom-1 border-100" style={{ padding: '40px 0' }}>
           <div className="container-xl w-full px-6">
-            <div className="flex align-items-center gap-6">
+            <div className="flex align-items-center" style={{ gap: '40px' }}>
               <div className="flex-1 relative">
                 <i className="pi pi-search text-gray-300" style={{ fontSize: '1.8rem', position: 'absolute', left: '0', top: '50%', transform: 'translateY(-50%)' }} />
                 <InputText
@@ -386,20 +430,21 @@ function Header({ forceLightMode = false }) {
               </div>
               <div className="flex gap-3">
                 <button
-                  className="bg-black text-white px-10 py-4 font-black uppercase border-none cursor-pointer hover:bg-gray-800 transition-all text-xs tracking-[0.2em]"
+                  className="bg-black text-white py-4 font-black uppercase border-none cursor-pointer hover:bg-gray-800 transition-all text-xs tracking-[0.2em]"
+                  style={{ padding: '0 40px' }}
                   onClick={handleSearch}
                 >
                   Tìm kiếm
                 </button>
                 <button
-                  className="bg-white text-black w-12 h-12 flex align-items-center justify-content-center border-1 border-200 cursor-pointer hover:border-black transition-all"
+                  className="bg-white text-black w-3rem h-3rem flex align-items-center justify-content-center border-1 border-200 cursor-pointer hover:border-black transition-all"
                   onClick={() => searchPanel.current?.hide()}
                 >
                   <i className="pi pi-times text-xl" />
                 </button>
               </div>
             </div>
-            <div className="mt-8 flex align-items-center gap-6">
+            <div className="mt-8 flex align-items-center" style={{ gap: '24px' }}>
               <span className="text-[10px] text-gray-400 uppercase font-black tracking-[0.2em]">Tìm kiếm phổ biến:</span>
               <div className="flex gap-5 text-[11px] uppercase text-gray-800 font-bold tracking-wider">
                 {["Áo thun", "Jeans", "Heattech", "Airism", "UV Cut"].map(term => (
@@ -439,7 +484,7 @@ function Header({ forceLightMode = false }) {
             ) : (
               wishlist.map((p) => (
                 <div key={p.id} className="flex gap-4 p-4 border-bottom-1 border-50 hover:bg-gray-50 transition-all group relative cursor-pointer" onClick={() => { navigate(`/product/${p.id}`); wishlistPanel.current?.hide(); }}>
-                  <div className="w-20 h-24 flex-shrink-0 overflow-hidden bg-gray-100 border-round">
+                  <div className="flex-shrink-0 overflow-hidden bg-gray-100 border-round" style={{ width: '80px', height: '96px' }}>
                     <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex flex-column justify-content-between flex-1 min-w-0 py-1">
@@ -497,7 +542,7 @@ function Header({ forceLightMode = false }) {
 
                 return (
                   <div key={item._id || `${productId}-${item.variantId}-${item.color}`} className="flex gap-4 p-4 border-bottom-1 border-50 hover:bg-gray-50 transition-all group relative cursor-pointer" onClick={() => { navigate(`/product/${productId}`); cartPanel.current?.hide(); }}>
-                    <div className="w-20 h-28 flex-shrink-0 overflow-hidden bg-gray-100 border-round">
+                    <div className="flex-shrink-0 overflow-hidden bg-gray-100 border-round" style={{ width: '80px', height: '112px' }}>
                       <img src={product.images?.[0] || "/img/default.png"} alt={product.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex flex-column justify-content-between flex-1 min-w-0 py-1">
@@ -563,11 +608,11 @@ function Header({ forceLightMode = false }) {
             <i className="pi pi-times text-2xl"></i>
           </button>
 
-          <div className="flex flex-column align-items-center justify-content-center pt-10 pb-6 border-bottom-1 border-100 flex-shrink-0">
+          <div className="flex flex-column align-items-center justify-content-center border-bottom-1 border-100 flex-shrink-0" style={{ padding: '40px 0 24px 0' }}>
             <div className="p-input-icon-left w-full px-6" style={{ maxWidth: '800px' }}>
               <i className="pi pi-search text-gray-300" style={{ fontSize: '1.4rem', left: '2rem' }} />
               <InputText
-                placeholder={segmentsData[selectedGender]?.searchPlaceholder?.toUpperCase()}
+                placeholder={(segmentsData[selectedGender]?.searchPlaceholder || "Tìm kiếm sản phẩm").toUpperCase()}
                 className="w-full border-none border-bottom-2 border-100 border-noround text-2xl bg-transparent py-4 pl-12 uppercase font-black focus:border-black transition-all outline-none"
                 style={{ letterSpacing: '0.02em' }}
                 onKeyDown={(e) => {
@@ -594,7 +639,7 @@ function Header({ forceLightMode = false }) {
                   setIsMenuOpen(false);
                 }}>
                   <div className="flex align-items-center gap-5">
-                    <div className="w-24 h-24 overflow-hidden bg-gray-100 flex-shrink-0 border-round transition-transform group-hover:scale-105 duration-500">
+                    <div className="overflow-hidden bg-gray-100 flex-shrink-0 border-round transition-transform group-hover:scale-105 duration-500" style={{ width: '96px', height: '96px' }}>
                       <img
                         src={cat.img}
                         alt={cat.title}
