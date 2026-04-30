@@ -329,14 +329,14 @@ const Cart = () => {
             {/* Left: Cart Items */}
             <div className="col-12 lg:col-8 pr-0 lg:pr-6">
               {cart.length === 0 ? (
-                <div className="py-20 text-center bg-white border-round-lg border-1 border-100 shadow-sm">
-                  <i className="pi pi-shopping-cart text-gray-100 text-6xl mb-4"></i>
-                  <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-6">Giỏ hàng của bạn đang trống</p>
+                <div className="py-20 text-center bg-white border-1 border-black">
+                  <i className="pi pi-shopping-cart text-black text-6xl mb-4"></i>
+                  <p className="text-black text-xs font-bold uppercase tracking-widest mb-6">Giỏ hàng của bạn đang trống</p>
                   <Link to="/search" className="inline-block bg-black text-white px-10 py-4 text-[10px] font-black uppercase tracking-[0.2em] no-underline hover:bg-gray-800 transition-all">Mua sắm ngay</Link>
                 </div>
               ) : (
                 <div className="flex flex-column gap-4">
-                  <div className="flex align-items-center px-4 py-2 bg-gray-50 border-round text-[10px] font-black uppercase tracking-widest text-gray-500">
+                  <div className="flex align-items-center px-4 py-3 bg-gray-100 border-bottom-1 border-black text-[10px] font-black uppercase tracking-[0.1em] text-black">
                     <div className="flex align-items-center gap-3 flex-1">
                       <Checkbox
                         checked={selectedItems.length === cart.length && cart.length > 0}
@@ -349,10 +349,10 @@ const Cart = () => {
                       />
                       <span>Tất cả sản phẩm ({cart.length})</span>
                     </div>
-                    <div className="hidden md:flex gap-12">
-                      <span className="w-24 text-center">Đơn giá</span>
-                      <span className="w-32 text-center">Số lượng</span>
-                      <span className="w-24 text-right">Tổng cộng</span>
+                    <div className="hidden md:flex align-items-center">
+                      <span className="text-center" style={{ width: '100px' }}>Đơn giá</span>
+                      <span className="text-center" style={{ width: '120px', margin: '0 2rem' }}>Số lượng</span>
+                      <span className="text-right" style={{ width: '120px' }}>Tổng cộng</span>
                     </div>
                   </div>
 
@@ -366,7 +366,7 @@ const Cart = () => {
                     return (
                       <div
                         key={item._id}
-                        className="p-4 md:p-6 bg-white border-1 border-100 border-round hover:border-gray-300 transition-all flex align-items-center gap-4 md:gap-6 relative group"
+                        className="py-4 px-3 md:py-5 md:px-4 bg-white border-bottom-1 border-gray-200 hover:surface-50 transition-all flex align-items-center gap-3 md:gap-4 relative group"
                       >
                         <Checkbox
                           checked={selectedItems.includes(item._id)}
@@ -378,7 +378,7 @@ const Cart = () => {
                           }}
                         />
                         
-                        <Link to={`/product/${product._id || product.id}`} className="w-24 h-32 flex-shrink-0 overflow-hidden bg-gray-50 border-round transition-transform hover:scale-105 duration-500">
+                        <Link to={`/product/${product._id || product.id}`} className="flex-shrink-0 overflow-hidden bg-gray-50 border-1 border-gray-200 transition-transform hover:scale-105 duration-500" style={{ width: '80px', height: '106px' }}>
                           <img src={productImg} alt={productName} className="w-full h-full object-cover" />
                         </Link>
 
@@ -395,34 +395,36 @@ const Cart = () => {
                             )}
                             <button 
                               onClick={() => removeItem(item)}
-                              className="mt-3 bg-transparent border-none text-[10px] font-black uppercase tracking-widest text-red-400 cursor-pointer hover:text-red-600 transition-colors p-0"
+                              className="mt-2 bg-transparent border-none text-[10px] font-black uppercase tracking-widest text-gray-400 cursor-pointer hover:text-red-600 transition-colors p-0 border-bottom-1 border-transparent hover:border-red-600 pb-1"
                             >
                               Xóa khỏi túi
                             </button>
                           </div>
 
-                          <div className="flex align-items-center justify-content-between w-full md:w-auto gap-0 md:gap-12">
-                            <div className="hidden md:block w-24 text-center text-sm font-black text-gray-400">
+                          <div className="flex align-items-center justify-content-between w-full md:w-auto mt-4 md:mt-0">
+                            <div className="hidden md:block text-center text-sm font-bold text-500" style={{ width: '100px' }}>
                               {pricePerUnit.toLocaleString("vi-VN")}₫
                             </div>
 
-                            <div className="w-32 flex align-items-center justify-content-center bg-gray-50 px-2 py-1 border-round border-1 border-100">
+                            <div className="flex align-items-stretch border-1 border-300 bg-white" style={{ width: '120px', height: '36px', margin: '0 2rem' }}>
                               <button 
                                 onClick={() => changeQty(item, -1)}
-                                className="w-8 h-8 bg-transparent border-none text-black cursor-pointer hover:bg-gray-200 transition-colors border-round flex align-items-center justify-content-center"
+                                className="bg-transparent border-none border-right-1 border-300 text-600 hover:text-900 hover:surface-100 cursor-pointer transition-colors flex align-items-center justify-content-center m-0 p-0"
+                                style={{ width: '36px' }}
                               >
                                 <i className="pi pi-minus text-[10px]"></i>
                               </button>
-                              <span className="flex-1 text-center text-xs font-black">{item.quantity}</span>
+                              <span className="flex-1 flex align-items-center justify-content-center text-sm font-bold text-900">{item.quantity}</span>
                               <button 
                                 onClick={() => changeQty(item, 1)}
-                                className="w-8 h-8 bg-transparent border-none text-black cursor-pointer hover:bg-gray-200 transition-colors border-round flex align-items-center justify-content-center"
+                                className="bg-transparent border-none border-left-1 border-300 text-600 hover:text-900 hover:surface-100 cursor-pointer transition-colors flex align-items-center justify-content-center m-0 p-0"
+                                style={{ width: '36px' }}
                               >
                                 <i className="pi pi-plus text-[10px]"></i>
                               </button>
                             </div>
 
-                            <div className="w-24 text-right text-sm font-black text-black">
+                            <div className="text-right text-sm font-bold text-900" style={{ width: '120px' }}>
                               {totalItemPrice.toLocaleString("vi-VN")}₫
                             </div>
                           </div>
@@ -436,20 +438,20 @@ const Cart = () => {
 
             {/* Right: Summary */}
             <div className="col-12 lg:col-4 mt-10 lg:mt-0">
-              <div className="bg-white p-8 border-1 border-100 border-round-xl sticky top-24 shadow-sm">
-                <h2 className="m-0 text-xl font-black uppercase tracking-tight mb-8 pb-4 border-bottom-1 border-gray-100 text-black">Tóm tắt đơn hàng</h2>
+              <div className="bg-white border-1 border-black sticky" style={{ top: '120px', padding: '32px' }}>
+                <h2 className="m-0 text-xl font-black uppercase tracking-tight mb-8 pb-4 border-bottom-1 border-gray-200 text-black">Tóm tắt đơn hàng</h2>
                 
                 <div className="mb-8">
                   <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">Mã giảm giá</label>
                   {appliedDiscount ? (
-                    <div className="flex align-items-center justify-content-between p-4 bg-green-50 border-1 border-green-100 border-round group">
+                    <div className="flex align-items-center justify-content-between p-4 border-1 group" style={{ backgroundColor: '#f0fdf4', borderColor: '#bbf7d0' }}>
                       <div className="flex align-items-center gap-3">
-                        <i className="pi pi-check-circle text-green-600"></i>
-                        <span className="text-xs font-black uppercase tracking-widest text-green-700">{appliedDiscount}</span>
+                        <i className="pi pi-check-circle" style={{ color: '#16a34a' }}></i>
+                        <span className="text-xs font-black uppercase tracking-widest" style={{ color: '#16a34a' }}>{appliedDiscount}</span>
                       </div>
                       <button 
                         onClick={handleRemoveDiscount}
-                        className="bg-transparent border-none text-gray-400 hover:text-red-500 cursor-pointer transition-colors"
+                        className="bg-transparent border-none text-gray-400 cursor-pointer transition-colors m-0 p-0 hover:text-900"
                       >
                         <i className="pi pi-times"></i>
                       </button>
@@ -458,7 +460,7 @@ const Cart = () => {
                     <button
                       onClick={() => setShowDiscountDialog(true)}
                       disabled={selectedItems.length === 0}
-                      className={`w-full py-4 text-[10px] font-black uppercase tracking-[0.2em] border-2 border-dashed transition-all ${selectedItems.length > 0 ? 'bg-white text-black border-black cursor-pointer hover:bg-gray-50' : 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed'}`}
+                      className={`w-full py-4 text-[10px] font-black uppercase tracking-[0.2em] border-1 border-dashed transition-all ${selectedItems.length > 0 ? 'bg-white text-black border-black cursor-pointer hover:bg-gray-50' : 'bg-gray-50 text-gray-400 border-gray-300 cursor-not-allowed'}`}
                     >
                       <i className="pi pi-tag mr-2"></i> Chọn mã giảm giá
                     </button>
@@ -467,30 +469,30 @@ const Cart = () => {
 
                 <div className="flex flex-column gap-4 mb-8">
                   <div className="flex justify-content-between align-items-center">
-                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Tạm tính</span>
-                    <span className="text-sm font-black text-gray-800">{selectedSubtotal.toLocaleString("vi-VN")}₫</span>
+                    <span className="text-[11px] font-bold text-500 uppercase tracking-widest">Tạm tính</span>
+                    <span className="text-sm font-black text-900">{selectedSubtotal.toLocaleString("vi-VN")}₫</span>
                   </div>
                   <div className="flex justify-content-between align-items-center">
-                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Thuế (10%)</span>
-                    <span className="text-sm font-black text-gray-800">{selectedTax.toLocaleString("vi-VN")}₫</span>
+                    <span className="text-[11px] font-bold text-500 uppercase tracking-widest">Thuế (10%)</span>
+                    <span className="text-sm font-black text-900">{selectedTax.toLocaleString("vi-VN")}₫</span>
                   </div>
                   <div className="flex justify-content-between align-items-center">
-                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Phí vận chuyển</span>
-                    <span className={`text-sm font-black ${selectedShippingFee === 0 ? 'text-green-600' : 'text-gray-800'}`}>
+                    <span className="text-[11px] font-bold text-500 uppercase tracking-widest">Phí vận chuyển</span>
+                    <span className="text-sm font-black" style={{ color: selectedShippingFee === 0 ? '#16a34a' : '#212529' }}>
                       {selectedShippingFee === 0 ? 'MIỄN PHÍ' : `${selectedShippingFee.toLocaleString("vi-VN")}₫`}
                     </span>
                   </div>
                   {selectedDiscount > 0 && (
-                    <div className="flex justify-content-between align-items-center text-green-600">
+                    <div className="flex justify-content-between align-items-center" style={{ color: '#16a34a' }}>
                       <span className="text-[11px] font-bold uppercase tracking-widest">Giảm giá</span>
                       <span className="text-sm font-black">-{selectedDiscount.toLocaleString("vi-VN")}₫</span>
                     </div>
                   )}
                 </div>
 
-                <div className="pt-6 border-top-1 border-gray-100 mb-8 flex justify-content-between align-items-end">
-                  <span className="text-xs font-black uppercase tracking-widest text-black">Tổng thanh toán</span>
-                  <span className="text-3xl font-black text-red-600 tracking-tighter leading-none">{selectedTotal.toLocaleString("vi-VN")}₫</span>
+                <div className="pt-6 border-top-1 border-gray-300 mb-8 flex justify-content-between align-items-end">
+                  <span className="text-xs font-black uppercase tracking-widest text-900">Tổng thanh toán</span>
+                  <span className="text-3xl font-black tracking-tighter leading-none" style={{ color: '#dc2626' }}>{selectedTotal.toLocaleString("vi-VN")}₫</span>
                 </div>
 
                 <button
@@ -507,7 +509,13 @@ const Cart = () => {
                     localStorage.setItem("checkoutItems", JSON.stringify(selectedProducts));
                     navigate("/checkout");
                   }}
-                  className={`w-full py-5 text-sm font-black uppercase tracking-[0.25em] border-none transition-all shadow-xl shadow-black/10 active:scale-95 ${selectedItems.length > 0 ? 'bg-black text-white cursor-pointer hover:bg-gray-800' : 'bg-gray-100 text-gray-300 cursor-not-allowed'}`}
+                  className={`w-full text-sm font-black uppercase tracking-[0.2em] border-1 transition-all cursor-pointer m-0`}
+                  style={{ 
+                    padding: '20px 0', 
+                    backgroundColor: selectedItems.length > 0 ? '#000' : '#f5f5f5', 
+                    color: selectedItems.length > 0 ? '#fff' : '#a3a3a3',
+                    borderColor: selectedItems.length > 0 ? '#000' : '#e5e5e5'
+                  }}
                 >
                   Tiếp tục thanh toán
                 </button>
@@ -518,9 +526,9 @@ const Cart = () => {
       </div>
 
       <Dialog
-        header={<span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Xác nhận xóa</span>}
+        header={<span className="text-[10px] font-black uppercase tracking-[0.2em] text-black">Xác nhận xóa</span>}
         visible={showConfirm}
-        style={{ width: "400px", borderRadius: '8px' }}
+        style={{ width: "400px", borderRadius: '0' }}
         modal
         onHide={() => setShowConfirm(false)}
         footer={
@@ -539,9 +547,9 @@ const Cart = () => {
       </Dialog>
 
       <Dialog
-        header={<span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Chọn mã giảm giá</span>}
+        header={<span className="text-[10px] font-black uppercase tracking-[0.2em] text-black">Chọn mã giảm giá</span>}
         visible={showDiscountDialog}
-        style={{ width: "480px", borderRadius: '8px' }}
+        style={{ width: "480px", borderRadius: '0' }}
         onHide={() => setShowDiscountDialog(false)}
       >
         <div className="flex flex-column gap-4 p-2">
@@ -553,7 +561,7 @@ const Cart = () => {
             availableDiscounts.map((discount) => (
               <div
                 key={discount._id}
-                className="p-5 border-1 border-100 border-round cursor-pointer hover:border-black transition-all group"
+                className="p-5 border-1 border-200 cursor-pointer hover:border-black transition-all group"
                 onClick={() => handleApplyDiscount(discount)}
               >
                 <div className="flex justify-content-between align-items-center">

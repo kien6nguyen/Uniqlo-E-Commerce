@@ -74,6 +74,9 @@ function Header({ forceLightMode = false }) {
       } catch (err) {
         console.error("Error loading user data:", err);
       }
+    } else {
+      const stored = JSON.parse(localStorage.getItem("wishlist")) || [];
+      setWishlist(stored);
     }
   };
 
@@ -115,7 +118,13 @@ function Header({ forceLightMode = false }) {
   const handleRemoveFromWishlist = async (e, productId) => {
     e.stopPropagation();
     const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!token) {
+      let stored = JSON.parse(localStorage.getItem("wishlist")) || [];
+      stored = stored.filter(p => p.id !== productId);
+      localStorage.setItem("wishlist", JSON.stringify(stored));
+      window.dispatchEvent(new CustomEvent("wishlistUpdated"));
+      return;
+    }
 
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/user/me/wishlist`, {
@@ -173,82 +182,57 @@ function Header({ forceLightMode = false }) {
       label: "NỮ",
       searchPlaceholder: "Tìm kiếm sản phẩm",
       categories: [
-        { title: "Áo thun", desc: "Cotton mềm mại", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-ut.jpg" },
-        { title: "Áo sơ mi", desc: "Thanh lịch", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-shirt.jpg" },
-        { title: "Áo khoác", desc: "Ấm áp mùa đông", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-outer.jpg" },
-        { title: "Quần dài", desc: "Dáng chuẩn", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-bottoms.jpg" },
-        { title: "Váy", desc: "Nữ tính", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-skirt.jpg" },
-        { title: "Đồ lót", desc: "Thoải mái", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-inner.jpg" },
-        { title: "Đồ ngủ", desc: "Dễ chịu", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-loungewear.jpg" },
-        { title: "Phụ kiện", desc: "Thời trang", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-accessories.jpg" },
-        { title: "Túi xách", desc: "Tiện dụng", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-bags.jpg" },
-        { title: "Giày", desc: "Êm ái", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-shoes.jpg" },
-        { title: "Đồ tập", desc: "Năng động", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-sport.jpg" },
-        { title: "Heattech", desc: "Giữ nhiệt", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-heattech.jpg" },
-        { title: "Airism", desc: "Thanh mát", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-airism.jpg" },
-        { title: "UV Cut", desc: "Chống nắng", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-uvcut.jpg" },
-        { title: "Sale", desc: "Ưu đãi lớn", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-sale.jpg" },
-        { title: "Mới về", desc: "Xu hướng", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-new.jpg" },
-        { title: "Bán chạy", desc: "Yêu thích", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-best.jpg" },
-        { title: "Trẻ trung", desc: "Phong cách", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-style.jpg" },
-        { title: "Cơ bản", desc: "Cần thiết", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-basic.jpg" },
-        { title: "Đặc biệt", desc: "Giới hạn", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-woman-special.jpg" },
+        { title: "Áo thun", desc: "Cotton mềm mại", img: "https://im.uniqlo.com/global-cms/spa/resb3e9c2c759d2ba295a13e15c92218be2fr.png" },
+        { title: "Áo sơ mi", desc: "Thanh lịch", img: "https://im.uniqlo.com/global-cms/spa/res8360b2663ae753b404d8fae0d9a98a04fr.png" },
+        { title: "Áo khoác", desc: "Ấm áp mùa đông", img: "https://im.uniqlo.com/global-cms/spa/res25ac7a37207d4f37b2fd57437b168f91fr.png" },
+        { title: "Quần dài", desc: "Dáng chuẩn", img: "https://im.uniqlo.com/global-cms/spa/resbd301f1838d82b5f710f5a14106e620afr.png" },
+        { title: "Váy", desc: "Nữ tính", img: "https://im.uniqlo.com/global-cms/spa/res5932d64c74a755e3e0f815d37a0a0232fr.png" },
+        { title: "Đồ lót", desc: "Thoải mái", img: "https://im.uniqlo.com/global-cms/spa/resaea75263a8cee7f4b463a5424033e26ffr.png" },
+        { title: "Túi xách", desc: "Tiện dụng", img: "https://im.uniqlo.com/global-cms/spa/rese1ac94da4e6f6fa90655960efd53637efr.png" },
+        { title: "Đồ tập", desc: "Năng động", img: "https://im.uniqlo.com/global-cms/spa/res0d66981beda5766bc32244efe7658982fr.png" },
+        { title: "Heattech", desc: "Giữ nhiệt", img: "https://im.uniqlo.com/global-cms/spa/res2c68013673020cabcdef5c5855c8ae2dfr.png" },
+        { title: "Trẻ trung", desc: "Dạo phố", img: "https://im.uniqlo.com/global-cms/spa/resd9c3860c7bb77be9f478ced420903b8ffr.png" },
+        { title: "Mới về", desc: "Xu hướng", img: "https://im.uniqlo.com/global-cms/spa/res8bf955a20222e15834552b987e2b4b50fr.png" },
       ]
     },
     man: {
       label: "NAM",
       searchPlaceholder: "Tìm kiếm sản phẩm nam",
       categories: [
-        { title: "Áo thun", desc: "Năng động", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-ut.jpg" },
-        { title: "Sơ mi", desc: "Lịch lãm", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-shirt.jpg" },
-        { title: "Áo khoác", desc: "Chất lượng cao", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-outer.jpg" },
-        { title: "Quần dài", desc: "Thoải mái", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-bottoms.jpg" },
-        { title: "Quần short", desc: "Phóng khoáng", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-shorts.jpg" },
-        { title: "Đồ lót", desc: "Khô thoáng", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-inner.jpg" },
-        { title: "Đồ ngủ", desc: "Thư giãn", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-loungewear.jpg" },
-        { title: "Phụ kiện", desc: "Nam tính", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-accessories.jpg" },
-        { title: "Túi", desc: "Tiện dụng", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-bags.jpg" },
-        { title: "Giày", desc: "Bền bỉ", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-shoes.jpg" },
-        { title: "Đồ tập", desc: "Dry-Ex", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-sport.jpg" },
-        { title: "Heattech", desc: "Siêu ấm", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-heattech.jpg" },
-        { title: "Airism", desc: "Tươi mát", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-airism.jpg" },
-        { title: "UV Cut", desc: "Bảo vệ da", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-uvcut.jpg" },
-        { title: "Sale", desc: "Giá tốt", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-sale.jpg" },
-        { title: "Mới về", desc: "Trình làng", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-new.jpg" },
-        { title: "K-IDS", desc: "Phối đồ", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-style.jpg" },
-        { title: "Blazer", desc: "Công sở", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-blazer.jpg" },
-        { title: "Polo", desc: "Cổ điển", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-polo.jpg" },
-        { title: "Jeans", desc: "Chắc chắn", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-man-jeans.jpg" },
+        { title: "Áo thun", desc: "Cotton mềm mại", img: "https://im.uniqlo.com/global-cms/spa/res7405a4506da77a4108a0697bd652634efr.png" },
+        { title: "Áo sơ mi", desc: "Thanh lịch", img: "https://im.uniqlo.com/global-cms/spa/res8360b2663ae753b404d8fae0d9a98a04fr.png" },
+        { title: "Áo khoác", desc: "Ấm áp mùa đông", img: "https://im.uniqlo.com/global-cms/spa/res25ac7a37207d4f37b2fd57437b168f91fr.png" },
+        { title: "Quần jean", desc: "Phóng khoáng", img: "https://im.uniqlo.com/global-cms/spa/res2c7bc83d952192fa554de295df2f433afr.png" },
+        { title: "Đồ lót", desc: "Khô thoáng", img: "https://im.uniqlo.com/global-cms/spa/res2d9dd548f5817a9ab53ca60577ccfbb2fr.png" },
+        { title: "Túi", desc: "Tiện dụng", img: "https://im.uniqlo.com/global-cms/spa/res13113a61a2e4a0a54f8972e35d3a1783fr.png" },
+        { title: "Đồ tập", desc: "Dry-Ex", img: "https://im.uniqlo.com/global-cms/spa/res0d66981beda5766bc32244efe7658982fr.png" },
+        { title: "Airism", desc: "Tươi mát", img: "https://im.uniqlo.com/global-cms/spa/resc343dd0bad46d2dcb41b4488c0d48885fr.png" },
+        { title: "Sơ mi tay ngắn", desc: "Mát mẻ", img: "https://im.uniqlo.com/global-cms/spa/rese9ad37f6048cd6bcc23daf3249cf04c7fr.png" },
       ]
     },
     "kid": {
       label: "TRẺ EM",
       searchPlaceholder: "Tìm kiếm sản phẩm trẻ em",
       categories: [
-        { title: "Áo thun UT", desc: "Họa tiết năng động", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-ut.jpg" },
-        { title: "Áo khoác", desc: "Ấm áp đến trường", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-outer.jpg" },
-        { title: "Quần dài", desc: "Co giãn thoải mái", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-bottoms.jpg" },
-        { title: "Đồ mặc nhà", desc: "Cotton mềm mại", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-loungewear.jpg" },
-        { title: "Áo sơ mi", desc: "Thanh lịch cho bé", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-shirt.jpg" },
-        { title: "Váy & Đầm", desc: "Dễ thương", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-dress.jpg" },
-        { title: "Đồ lót", desc: "Thấm hút tốt", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-inner.jpg" },
-        { title: "Phụ kiện", desc: "Mũ & Tất", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-accessories.jpg" },
-        { title: "Heattech", desc: "Giữ ấm mùa đông", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-heattech.jpg" },
-        { title: "Airism", desc: "Khô thoáng ngày hè", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-kids-airism.jpg" }
+        { title: "Áo thun UT", desc: "Họa tiết năng động", img: "https://im.uniqlo.com/global-cms/spa/res3d43a7fd61f7ae3615eb67d85467cf0efr.png" },
+        { title: "Áo khoác", desc: "Ấm áp đến trường", img: "https://im.uniqlo.com/global-cms/spa/resdd2d5c4ee785273e6c8f6096d5cee954fr.png" },
+        { title: "Quần dài", desc: "Co giãn thoải mái", img: "https://im.uniqlo.com/global-cms/spa/rescc78e33b84a6faa69867797afc7c83befr.png" },
+        { title: "Quần short", desc: "Cotton thoải mái", img: "https://im.uniqlo.com/global-cms/spa/res694288ec6d2618b771c4246fc31b4043fr.png" },
+        { title: "Áo sơ mi", desc: "Thanh lịch cho bé", img: "https://im.uniqlo.com/global-cms/spa/rescc78e33b84a6faa69867797afc7c83befr.png" },
+        { title: "Váy & Đầm", desc: "Dễ thương", img: "https://im.uniqlo.com/global-cms/spa/res7fcae243567753e74941442805ac9596fr.png" },
+        { title: "Đồ lót", desc: "Thấm hút tốt", img: "https://im.uniqlo.com/global-cms/spa/res50b7df682fc95d450c1cf55d1cccef30fr.png" },
+        { title: "Phụ kiện", desc: "Mũ & Tất", img: "https://im.uniqlo.com/global-cms/spa/resae64e7024dd87fc0fa92a691afa1683efr.png" },
+        { title: "Airism", desc: "Khô thoáng ngày hè", img: "https://im.uniqlo.com/global-cms/spa/resc343dd0bad46d2dcb41b4488c0d48885fr.png" }
       ]
     },
     "baby": {
       label: "EM BÉ",
       searchPlaceholder: "Tìm kiếm sản phẩm em bé",
       categories: [
-        { title: "Đồ sơ sinh", desc: "Cotton 100%", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby-newborn.jpg" },
-        { title: "Bodysuit", desc: "Tiện dụng cho bé", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby-bodysuit.jpg" },
-        { title: "Áo khoác", desc: "Che chắn nhẹ nhàng", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby-outer.jpg" },
-        { title: "Quần bé trai", desc: "Năng động", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby-bottoms.jpg" },
-        { title: "Váy bé gái", desc: "Xinh xắn", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby-dress.jpg" },
-        { title: "Yếm & Phụ kiện", desc: "Cần thiết cho bé", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby-accessories.jpg" },
-        { title: "Đồ ngủ", desc: "Giấc ngủ ngon", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby-loungewear.jpg" },
-        { title: "Heattech Baby", desc: "Bảo vệ bé", img: "https://image.uniqlo.com/UQ/ST3/vn/imagesother/home/24FW-baby-heattech.jpg" }
+        { title: "Đồ sơ sinh", desc: "Cotton 100%", img: "https://im.uniqlo.com/global-cms/spa/resbc2e67d2abd1c042d51454226fd25d41fr.png" },
+        { title: "Bodysuit", desc: "Tiện dụng cho bé", img: "https://im.uniqlo.com/global-cms/spa/res83985380220d481a951983f60ff48d99fr.png" },
+        { title: "Mới về", desc: "Xu hướng", img: "https://im.uniqlo.com/global-cms/spa/res8bf955a20222e15834552b987e2b4b50fr.png" },
+        { title: "Khuyến mãi", desc: "Giá tốt mỗi tuần", img: "https://im.uniqlo.com/global-cms/spa/res13113a61a2e4a0a54f8972e35d3a1783fr.png" },
       ]
     }
   };
@@ -263,7 +247,7 @@ function Header({ forceLightMode = false }) {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [pathname]);
 
@@ -309,9 +293,8 @@ function Header({ forceLightMode = false }) {
                         setIsMenuOpen(true);
                       }
                     }}
-                    className={`bg-transparent border-none no-underline font-light text-lg uppercase transition-all py-2 px-1 relative cursor-pointer ${
-                      isHome && !isMenuOpen && !forceLightMode ? "text-white" : "text-black"
-                    } ${isActive || isRouteActive ? "opacity-100" : "opacity-80 hover:opacity-100"}`}
+                    className={`bg-transparent border-none no-underline font-light text-lg uppercase transition-all py-2 px-1 relative cursor-pointer ${isHome && !isMenuOpen && !forceLightMode ? "text-white" : "text-black"
+                      } ${isActive || isRouteActive ? "opacity-100" : "opacity-80 hover:opacity-100"}`}
                     style={{
                       textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none',
                       borderBottom: (isActive || isRouteActive) ? (isHome && !isMenuOpen && !forceLightMode ? '2px solid white' : '2px solid black') : '2px solid transparent'
@@ -337,12 +320,29 @@ function Header({ forceLightMode = false }) {
           </div>
 
           {/* 2. Wishlist Icon */}
-          <div className="cursor-pointer relative" onClick={(e) => {
+          <div className="cursor-pointer relative p-2" onClick={(e) => {
             setIsMenuOpen(false);
             wishlistPanel.current?.toggle(e);
           }}>
             <i className="pi pi-heart text-xl" style={{ textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
-            {wishlist.length > 0 && <Badge value={wishlist.length} severity="danger" className="absolute -top-2 -right-2" />}
+            {wishlist.length > 0 && (
+              <span className="absolute border-circle flex align-items-center justify-content-center font-black transition-all"
+                style={{
+                  top: '0',
+                  right: '0',
+                  width: '16px',
+                  height: '16px',
+                  fontSize: '9px',
+                  lineHeight: '1',
+                  zIndex: 50,
+                  backgroundColor: isHome && !isMenuOpen && !forceLightMode ? 'white' : 'black',
+                  color: isHome && !isMenuOpen && !forceLightMode ? 'black' : 'white',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                  border: 'none'
+                }}>
+                {wishlist.length}
+              </span>
+            )}
           </div>
 
           {/* 3. Profile Icon */}
@@ -376,11 +376,11 @@ function Header({ forceLightMode = false }) {
             <i className="pi pi-shopping-cart text-xl" style={{ textShadow: isHome && !isMenuOpen && !forceLightMode ? '0 1px 3px rgba(0,0,0,0.5)' : 'none' }}></i>
             {totalCartCount > 0 && (
               <span className="absolute border-circle flex align-items-center justify-content-center font-black transition-all"
-                style={{ 
-                  top: '0', 
-                  right: '0', 
-                  width: '16px', 
-                  height: '16px', 
+                style={{
+                  top: '0',
+                  right: '0',
+                  width: '16px',
+                  height: '16px',
                   fontSize: '9px',
                   lineHeight: '1',
                   zIndex: 50,
@@ -457,13 +457,13 @@ function Header({ forceLightMode = false }) {
       </OverlayPanel>
 
       {/* WISHLIST OVERLAY */}
-      <OverlayPanel 
-        ref={wishlistPanel} 
-        dismissable 
-        style={{ 
-          width: '380px', 
-          borderRadius: '8px', 
-          border: '1px solid #eee', 
+      <OverlayPanel
+        ref={wishlistPanel}
+        dismissable
+        style={{
+          width: '380px',
+          borderRadius: '8px',
+          border: '1px solid #eee',
           boxShadow: '0 15px 50px rgba(0,0,0,0.12)',
           padding: '0',
           overflow: 'hidden',
@@ -479,7 +479,7 @@ function Header({ forceLightMode = false }) {
             {wishlist.length === 0 ? (
               <div className="py-12 px-6 text-center flex flex-column align-items-center gap-3">
                 <i className="pi pi-heart text-gray-100 text-6xl"></i>
-                <p className="text-gray-400 m-0 text-xs font-bold uppercase tracking-widest leading-relaxed">Bạn chưa có sản phẩm nào<br/>trong danh sách yêu thích</p>
+                <p className="text-gray-400 m-0 text-xs font-bold uppercase tracking-widest leading-relaxed">Bạn chưa có sản phẩm nào<br />trong danh sách yêu thích</p>
               </div>
             ) : (
               wishlist.map((p) => (
@@ -509,13 +509,13 @@ function Header({ forceLightMode = false }) {
 
 
       {/* CART OVERLAY */}
-      <OverlayPanel 
-        ref={cartPanel} 
-        dismissable 
-        style={{ 
-          width: '400px', 
-          borderRadius: '8px', 
-          border: '1px solid #eee', 
+      <OverlayPanel
+        ref={cartPanel}
+        dismissable
+        style={{
+          width: '400px',
+          borderRadius: '8px',
+          border: '1px solid #eee',
           boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
           padding: '0',
           overflow: 'hidden',
@@ -631,26 +631,25 @@ function Header({ forceLightMode = false }) {
             </div>
           </div>
 
-          <div className="p-8 overflow-y-auto" style={{ maxHeight: '60vh' }}>
+          <div className="py-6 px-8 overflow-y-auto" style={{ maxHeight: '65vh' }}>
             <div className="grid m-0">
               {segmentsData[selectedGender]?.categories.map((cat, idx) => (
-                <div key={idx} className="col-3 p-4 hover:bg-gray-50 cursor-pointer transition-all border-round group" onClick={() => {
+                <div key={idx} className="col-4 md:col-3 lg:col-2 p-4 hover:surface-50 cursor-pointer transition-colors border-round group flex flex-column align-items-center text-center" onClick={() => {
                   navigate(`/search?gender=${selectedGender}&sub=${encodeURIComponent(cat.title)}`);
                   setIsMenuOpen(false);
                 }}>
-                  <div className="flex align-items-center gap-5">
-                    <div className="overflow-hidden bg-gray-100 flex-shrink-0 border-round transition-transform group-hover:scale-105 duration-500" style={{ width: '96px', height: '96px' }}>
-                      <img
-                        src={cat.img}
-                        alt={cat.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => e.target.src = "/logo.png"}
-                      />
-                    </div>
-                    <div className="flex flex-column gap-1">
-                      <span className="font-black text-xs text-black uppercase tracking-tight group-hover:text-red-600 transition-colors">{cat.title}</span>
-                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{cat.desc}</span>
-                    </div>
+                  <div className="flex align-items-center justify-content-center flex-shrink-0 transition-transform group-hover:scale-110 duration-500" style={{ width: '88px', height: '88px' }}>
+                    <img
+                      src={cat.img}
+                      alt={cat.title}
+                      className="w-full h-full object-contain mix-blend-multiply"
+                      style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.04))' }}
+                      onError={(e) => e.target.src = "/logo.png"}
+                    />
+                  </div>
+                  <div className="flex flex-column gap-1 mt-3">
+                    <span className="font-black text-[11px] text-900 uppercase tracking-widest group-hover:text-red-600 transition-colors">{cat.title}</span>
+                    <span className="text-[9px] text-500 font-bold uppercase tracking-widest hidden md:block">{cat.desc}</span>
                   </div>
                 </div>
               ))}

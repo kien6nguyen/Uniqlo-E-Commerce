@@ -504,6 +504,7 @@ const ProductListPage = () => {
           border-radius: 4px;
           transition: all 0.2s;
           color: #666;
+          font-family: inherit;
         }
         .filter-trigger:hover {
           background-color: #f8f8f8;
@@ -690,6 +691,7 @@ const ProductListPage = () => {
           padding: 8px 12px;
           border-radius: 4px;
           transition: all 0.2s;
+          font-family: inherit;
         }
         .clear-filters-btn:hover {
           background: #fff1f2;
@@ -731,6 +733,7 @@ const ProductListPage = () => {
           letter-spacing: 0.2em;
           cursor: pointer;
           transition: all 0.3s;
+          font-family: inherit;
         }
         .reset-btn:hover {
           transform: translateY(-2px);

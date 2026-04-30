@@ -224,7 +224,7 @@ const ProductDetail = () => {
                       <div 
                         key={color}
                         onClick={() => setSelectedColor(color)}
-                        className={`border-circle cursor-pointer border-2 transition-all duration-300 p-1 flex align-items-center justify-content-center ${selectedColor === color ? 'border-gray-900 shadow-4' : 'border-300 hover:border-600'}`}
+                        className={`border-circle cursor-pointer border-2 transition-all duration-300 p-1 flex align-items-center justify-content-center ${selectedColor === color ? 'border-900 shadow-4' : 'border-300 hover:border-600'}`}
                         style={{ width: '48px', height: '48px', transform: selectedColor === color ? 'scale(1.1)' : 'scale(1)' }}
                       >
                         <div className="w-full h-full border-circle" style={{ backgroundColor: color.toLowerCase(), border: '1px solid rgba(0,0,0,0.1)', boxShadow: 'inset 0 2px 4px 0 rgba(0,0,0,0.06)' }}></div>
@@ -275,7 +275,7 @@ const ProductDetail = () => {
                 <button 
                   disabled={currentStock <= 0}
                   onClick={addToCart}
-                  className={`w-full p-4 text-sm font-bold uppercase transition-all border-none border-round cursor-pointer shadow-2 ${currentStock > 0 ? 'bg-gray-900 text-white hover:bg-gray-800' : 'surface-200 text-500 cursor-not-allowed'}`}
+                  className={`w-full p-4 text-sm font-bold uppercase transition-all border-none rounded cursor-pointer shadow-md ${currentStock > 0 ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
                   style={{ letterSpacing: '0.2em' }}
                 >
                   {currentStock > 0 ? "Thêm vào túi đồ" : "Hết hàng"}
@@ -376,7 +376,7 @@ const ProductDetail = () => {
                    <Rating value={Math.round(product.averageRating || 5)} readOnly stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-500 text-lg' }, offIcon: { className: 'text-300 text-lg' } }} />
                 </div>
                 <p className="text-xs font-bold text-600 uppercase mb-5" style={{ letterSpacing: '0.1em' }}>Đánh giá trung bình</p>
-                <button className="w-full surface-0 border-1 border-900 p-3 text-xs font-bold uppercase transition-all cursor-pointer hover:bg-gray-900 hover:text-white" style={{ letterSpacing: '0.1em' }}>
+                <button className="w-full surface-0 border-1 border-900 p-3 text-xs font-bold uppercase transition-all cursor-pointer hover:surface-900 hover:text-white" style={{ letterSpacing: '0.1em' }}>
                   Viết đánh giá
                 </button>
               </div>

@@ -65,7 +65,7 @@ function Login() {
       if (data && data.success) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
-        navigate("/");
+        window.location.href = "/";
       } else {
         setError("Sai tên đăng nhập hoặc mật khẩu");
       }

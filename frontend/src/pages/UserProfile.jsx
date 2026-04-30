@@ -400,6 +400,7 @@ const UserProfile = () => {
         { label: "Địa chỉ nhận hàng", icon: "pi pi-map-marker", index: 1 },
         { label: "Đổi mật khẩu", icon: "pi pi-lock", index: 2 },
         { label: "Đơn mua", icon: "pi pi-shopping-bag", index: 3, badge: orders.length },
+        { label: "Đăng xuất", icon: "pi pi-sign-out", index: 4, isLogout: true },
     ];
 
     return (
@@ -448,14 +449,22 @@ const UserProfile = () => {
                                     const isActive = activeIndex === item.index;
                                     return (
                                         <div key={item.index} onClick={() => {
+                                            if (item.isLogout) {
+                                                if (window.confirm("Bạn có chắc muốn đăng xuất?")) {
+                                                    localStorage.removeItem("token");
+                                                    localStorage.removeItem("user");
+                                                    window.location.href = "/login";
+                                                }
+                                                return;
+                                            }
                                             setActiveIndex(item.index);
                                             navigate(`/profile?tab=${item.index}`, { replace: true });
-                                        }} className={`flex align-items-center justify-content-between py-4 border-bottom-1 border-100 cursor-pointer transition-all duration-300 select-none group ${isActive ? 'bg-gray-50 border-l-4' : 'hover:bg-gray-50'}`} style={{ borderLeft: isActive ? '4px solid #111' : '4px solid transparent', paddingLeft: isActive ? '1rem' : '0' }}>
+                                        }} className={`flex align-items-center justify-content-between py-4 border-bottom-1 border-200 cursor-pointer transition-all duration-300 select-none group ${isActive ? 'surface-100' : 'hover:surface-50'}`} style={{ borderLeft: isActive ? '4px solid #111' : '4px solid transparent', paddingLeft: '1rem', paddingRight: '1rem' }}>
                                             <div className="flex align-items-center gap-3">
-                                                <i className={`${item.icon} ${isActive ? 'text-900' : 'text-400'} group-hover:text-900 transition-colors`} style={{ fontSize: '1.1rem' }}></i>
-                                                <span className={`text-[11px] uppercase tracking-wider font-black ${isActive ? 'text-900' : 'text-600 group-hover:text-900'}`}>{item.label}</span>
+                                                <i className={`${item.icon} ${isActive ? 'text-900' : 'text-500'} group-hover:text-900 transition-colors`} style={{ fontSize: '1.2rem', width: '24px', textAlign: 'center' }}></i>
+                                                <span className={`text-xs uppercase tracking-widest font-bold ${isActive ? 'text-900' : 'text-600 group-hover:text-900'} ${item.isLogout ? 'text-red-600 group-hover:text-red-700' : ''}`}>{item.label}</span>
                                             </div>
-                                            {item.badge > 0 && <span className="bg-red-600 text-white border-circle flex align-items-center justify-content-center font-bold text-[9px]" style={{ width: '18px', height: '18px' }}>{item.badge}</span>}
+                                            {item.badge > 0 && <span className="text-white border-circle flex align-items-center justify-content-center font-bold text-[9px]" style={{ width: '20px', height: '20px', backgroundColor: '#dc2626' }}>{item.badge}</span>}
                                         </div>
                                     );
                                 })}
@@ -475,7 +484,7 @@ const UserProfile = () => {
                                         <div className="field col-12 md:col-6"><label className="font-bold text-900 uppercase text-xs tracking-widest mb-3 block">Họ và tên</label><InputText value={user.fullname} onChange={(e) => setUser({ ...user, fullname: e.target.value })} className="surface-0 border-1 border-400 text-900 border-noround p-3 focus:border-900 transition-colors shadow-none" placeholder="Nhập họ và tên" /></div>
                                         <div className="field col-12 md:col-6"><label className="font-bold text-900 uppercase text-xs tracking-widest mb-3 block">Email</label><InputText value={user.email} disabled className="surface-100 text-500 border-1 border-200 border-noround p-3 cursor-not-allowed" /></div>
                                     </div>
-                                    <div className="mt-8 border-top-1 surface-border pt-6"><Button label="Lưu thay đổi" onClick={handleUpdateProfile} className="border-noround font-bold uppercase tracking-widest px-8 py-3 text-xs bg-gray-900 text-white hover:bg-black transition-colors border-none" /></div>
+                                    <div className="mt-8 border-top-1 surface-border pt-6"><Button label="Lưu thay đổi" onClick={handleUpdateProfile} className="border-noround font-bold uppercase tracking-widest px-8 py-3 text-xs transition-colors border-none cursor-pointer" style={{ backgroundColor: '#111', color: '#fff' }} /></div>
                                 </div>
                             )}
 
@@ -484,7 +493,7 @@ const UserProfile = () => {
                                 <div className="fadein animation-duration-400 h-full flex flex-column">
                                     <div className="flex justify-content-between align-items-center mb-6 pb-3 border-bottom-2 border-900">
                                         <div><h3 className="text-xl font-bold text-900 m-0 uppercase tracking-tight">Địa chỉ của tôi</h3></div>
-                                        <Button label="Thêm địa chỉ" icon="pi pi-plus" size="small" onClick={() => { setEditingId(null); setAddressForm({ receiver: "", phone: "", detail: "", province: null, district: null, ward: null }); setShowAddressDialog(true) }} className="border-noround font-bold uppercase tracking-widest text-xs px-4 py-2 bg-gray-900 text-white hover:bg-black border-none" />
+                                        <Button label="Thêm địa chỉ" icon="pi pi-plus" size="small" onClick={() => { setEditingId(null); setAddressForm({ receiver: "", phone: "", detail: "", province: null, district: null, ward: null }); setShowAddressDialog(true) }} className="border-noround font-bold uppercase tracking-widest text-xs px-4 py-2 border-none cursor-pointer" style={{ backgroundColor: '#111', color: '#fff' }} />
                                     </div>
                                     <div className="flex flex-column flex-1">
                                         {user.shippingAddress && user.shippingAddress.length > 0 ? 
@@ -537,7 +546,7 @@ const UserProfile = () => {
                                         <div className="flex flex-column gap-2"><label className="font-bold text-900 uppercase text-xs tracking-widest block">Mật khẩu hiện tại</label><Password value={passwords.current} onChange={(e) => setPasswords({ ...passwords, current: e.target.value })} toggleMask feedback={false} inputClassName="w-full surface-0 border-1 border-400 text-900 border-noround p-3 focus:border-900 transition-colors shadow-none" className="w-full" /></div>
                                         <div className="flex flex-column gap-2"><label className="font-bold text-900 uppercase text-xs tracking-widest block">Mật khẩu mới</label><Password value={passwords.new} onChange={(e) => setPasswords({ ...passwords, new: e.target.value })} toggleMask inputClassName="w-full surface-0 border-1 border-400 text-900 border-noround p-3 focus:border-900 transition-colors shadow-none" className="w-full" /></div>
                                         <div className="flex flex-column gap-2"><label className="font-bold text-900 uppercase text-xs tracking-widest block">Xác nhận mật khẩu mới</label><Password value={passwords.confirm} onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })} toggleMask feedback={false} inputClassName="w-full surface-0 border-1 border-400 text-900 border-noround p-3 focus:border-900 transition-colors shadow-none" className="w-full" /></div>
-                                        <div className="mt-5"><Button label="Cập nhật mật khẩu" onClick={handleChangePassword} className="border-noround font-bold uppercase tracking-widest px-8 py-3 text-xs bg-gray-900 text-white hover:bg-black transition-colors border-none" /></div>
+                                        <div className="mt-5"><Button label="Cập nhật mật khẩu" onClick={handleChangePassword} className="border-noround font-bold uppercase tracking-widest px-8 py-3 text-xs transition-colors border-none cursor-pointer" style={{ backgroundColor: '#111', color: '#fff' }} /></div>
                                     </div>
                                 </div>
                             )}
@@ -626,7 +635,7 @@ const UserProfile = () => {
                     <InputText value={addressForm.detail} onChange={(e) => setAddressForm({ ...addressForm, detail: e.target.value })} placeholder="Địa chỉ chi tiết" className="w-full border-noround border-1 border-400 p-3 focus:border-900 mt-2" />
                     <div className="flex justify-content-end gap-3 mt-4">
                         <Button label="Hủy" className="border-noround bg-white text-900 border-1 border-900 px-5 font-bold uppercase tracking-widest text-xs" onClick={() => setShowAddressDialog(false)} />
-                        <Button label="Lưu địa chỉ" className="border-noround bg-gray-900 text-white border-none hover:bg-black px-5 font-bold uppercase tracking-widest text-xs" onClick={handleSaveAddress} />
+                        <Button label="Lưu địa chỉ" className="border-noround border-none cursor-pointer px-5 font-bold uppercase tracking-widest text-xs" style={{ backgroundColor: '#111', color: '#fff' }} onClick={handleSaveAddress} />
                     </div>
                 </div>
             </Dialog>
@@ -769,7 +778,8 @@ const UserProfile = () => {
                         <div className="flex justify-content-end mt-4">
                             <Button
                                 label="Đóng"
-                                className="border-noround bg-gray-900 text-white border-none hover:bg-black px-6 py-3 font-bold uppercase tracking-widest text-xs"
+                                className="border-noround border-none cursor-pointer px-6 py-3 font-bold uppercase tracking-widest text-xs"
+                                style={{ backgroundColor: '#111', color: '#fff' }}
                                 onClick={() => setShowOrderDialog(false)}
                             />
                         </div>
