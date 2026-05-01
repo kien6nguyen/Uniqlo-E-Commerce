@@ -578,7 +578,8 @@ function Header({ forceLightMode = false }) {
                 <span className="text-black font-black text-2xl tracking-tighter">{totalCartPrice.toLocaleString("vi-VN")}₫</span>
               </div>
               <button
-                className="w-full bg-black text-white py-4 font-black uppercase border-none cursor-pointer hover:bg-gray-800 transition-all text-xs tracking-[0.25em] shadow-lg shadow-black/10"
+                className="w-full py-4 font-black uppercase border-none cursor-pointer transition-all text-xs tracking-[0.25em] shadow-lg shadow-black/10"
+                style={{ backgroundColor: '#000000', color: '#ffffff' }}
                 onClick={() => { navigate("/checkout"); cartPanel.current?.hide(); }}
               >
                 Thanh toán ngay

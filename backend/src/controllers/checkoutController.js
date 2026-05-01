@@ -66,7 +66,7 @@ exports.checkout = async (req, res) => {
         await user.save();
         isNewUser = true;
 
-        await transporter.sendMail({
+        transporter.sendMail({
           from: process.env.EMAIL_USER,
           to: email,
           subject: "Tài khoản của bạn đã được tạo",
@@ -78,7 +78,7 @@ exports.checkout = async (req, res) => {
             <p>Vui lòng đăng nhập và đặt lại mật khẩu tại trang Profile.</p>
             <p>Link đăng nhập: <a href="${process.env.CLIENT_URL}/login">${process.env.CLIENT_URL}/login</a></p>
           `
-        });
+        }).catch(err => console.error("Email send error:", err));
 
         cart.user = user._id;
         cart.sessionId = undefined;
@@ -210,7 +210,7 @@ exports.checkout = async (req, res) => {
     } else {
       statusText = "Chờ xác nhận - Thanh toán khi nhận hàng";
     }
-    await transporter.sendMail({
+    transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
       subject: `Hóa đơn đơn hàng #${order._id}`,
@@ -227,7 +227,7 @@ exports.checkout = async (req, res) => {
         <p><strong>Trạng thái:</strong> Chờ thanh toán</p>
         ${isNewUser ? '<p><em>Tài khoản của bạn đã được tạo. Vui lòng đăng nhập và đặt lại mật khẩu.</em></p>' : ''}
       `
-    });
+    }).catch(err => console.error("Email send error:", err));
 
     res.json({
       success: true,

@@ -914,7 +914,7 @@ const Checkout = () => {
               <Button
                 label={paymentMethod === 'vnpay' ? "THANH TOÁN VNPAY" : "ĐẶT HÀNG"} // Đổi label nút bấm
                 className="w-full"
-                style={{ backgroundColor: "#0d6efd", border: "none", fontWeight: "bold", height: "50px" }}
+                style={{ backgroundColor: "#000000", color: "#ffffff", border: "none", fontWeight: "bold", height: "50px", letterSpacing: "0.1em" }}
                 onClick={handlePayment}
                 loading={loading}
               />

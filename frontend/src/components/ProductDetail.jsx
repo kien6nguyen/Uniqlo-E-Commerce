@@ -275,8 +275,13 @@ const ProductDetail = () => {
                 <button 
                   disabled={currentStock <= 0}
                   onClick={addToCart}
-                  className={`w-full p-4 text-sm font-bold uppercase transition-all border-none rounded cursor-pointer shadow-md ${currentStock > 0 ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
-                  style={{ letterSpacing: '0.2em' }}
+                  className={`w-full p-4 text-sm font-bold uppercase transition-all border-none rounded shadow-md`}
+                  style={{ 
+                    letterSpacing: '0.2em', 
+                    backgroundColor: currentStock > 0 ? '#000000' : '#e5e7eb', 
+                    color: currentStock > 0 ? '#ffffff' : '#6b7280',
+                    cursor: currentStock > 0 ? 'pointer' : 'not-allowed'
+                  }}
                 >
                   {currentStock > 0 ? "Thêm vào túi đồ" : "Hết hàng"}
                 </button>
