@@ -32,7 +32,13 @@ exports.createVnpayPayment = async (req, res) => {
     const tmnCode = process.env.VNP_TMN_CODE;
     const secretKey = process.env.VNP_HASH_SECRET;
     const vnpUrl = process.env.VNP_URL;
-    const returnUrl = process.env.VNP_RETURN_URL;
+    let returnUrl = process.env.VNP_RETURN_URL;
+    if (returnUrl && returnUrl.startsWith('https//')) {
+        returnUrl = returnUrl.replace('https//', 'https://');
+    } else if (returnUrl && returnUrl.startsWith('http//')) {
+        returnUrl = returnUrl.replace('http//', 'http://');
+    }
+
     let ipAddr =
       req.headers["x-forwarded-for"] ||
       req.connection.remoteAddress ||
@@ -94,6 +100,12 @@ exports.vnpayReturn = async (req, res) => {
     delete vnp_Params["vnp_SecureHashType"];
 
     const secretKey = process.env.VNP_HASH_SECRET;
+    let clientUrl = process.env.CLIENT_URL;
+    if (clientUrl && clientUrl.startsWith('https//')) {
+        clientUrl = clientUrl.replace('https//', 'https://');
+    } else if (clientUrl && clientUrl.startsWith('http//')) {
+        clientUrl = clientUrl.replace('http//', 'http://');
+    }
 
     let vnp_Params_Sorted = sortObject(vnp_Params);
     const signData = qs.stringify(vnp_Params_Sorted, { encode: false });
@@ -105,14 +117,14 @@ exports.vnpayReturn = async (req, res) => {
 
     if (secureHash !== signed) {
       console.log("Invalid Signature");
-      return res.redirect(`${process.env.CLIENT_URL}/payment/failed?message=InvalidSignature`);
+      return res.redirect(`${clientUrl}/payment/failed?message=InvalidSignature`);
     }
 
     const order = await Order.findById(orderId);
 
     if (!order) {
       console.log("Order Not Found:", orderId);
-      return res.redirect(`${process.env.CLIENT_URL}/payment/failed?message=OrderNotFound`);
+      return res.redirect(`${clientUrl}/payment/failed?message=OrderNotFound`);
     }
 
     if (responseCode === "00") {
@@ -129,18 +141,20 @@ exports.vnpayReturn = async (req, res) => {
         await Cart.deleteOne({ user: order.user });
       }
 
-      return res.redirect(`${process.env.CLIENT_URL}/payment/success?orderId=${order._id}`);
+      return res.redirect(`${clientUrl}/payment/success?orderId=${order._id}`);
     } else {
       order.payment.status = "failed";
       order.status = "Cancelled";
       order.history.push({ status: "Cancelled", updatedAt: new Date() });
       await order.save();
 
-      return res.redirect(`${process.env.CLIENT_URL}/payment/failed?orderId=${order._id}&code=${responseCode}`);
+      return res.redirect(`${clientUrl}/payment/failed?orderId=${order._id}&code=${responseCode}`);
     }
   } catch (err) {
     console.error("VNPAY return error:", err);
-    return res.redirect(`${process.env.CLIENT_URL}/payment/failed?message=ServerError`);
+    let clientUrl = process.env.CLIENT_URL;
+    if (clientUrl && clientUrl.startsWith('https//')) clientUrl = clientUrl.replace('https//', 'https://');
+    return res.redirect(`${clientUrl}/payment/failed?message=ServerError`);
   }
 };
 
