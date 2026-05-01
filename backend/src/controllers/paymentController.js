@@ -33,9 +33,9 @@ exports.createVnpayPayment = async (req, res) => {
     const secretKey = process.env.VNP_HASH_SECRET;
     const vnpUrl = process.env.VNP_URL;
     let returnUrl = process.env.VNP_RETURN_URL;
-    if (returnUrl && returnUrl.startsWith('https//')) {
+    if (returnUrl) {
+        returnUrl = returnUrl.replace('http://https//', 'https://');
         returnUrl = returnUrl.replace('https//', 'https://');
-    } else if (returnUrl && returnUrl.startsWith('http//')) {
         returnUrl = returnUrl.replace('http//', 'http://');
     }
 
@@ -101,9 +101,9 @@ exports.vnpayReturn = async (req, res) => {
 
     const secretKey = process.env.VNP_HASH_SECRET;
     let clientUrl = process.env.CLIENT_URL;
-    if (clientUrl && clientUrl.startsWith('https//')) {
+    if (clientUrl) {
+        clientUrl = clientUrl.replace('http://https//', 'https://');
         clientUrl = clientUrl.replace('https//', 'https://');
-    } else if (clientUrl && clientUrl.startsWith('http//')) {
         clientUrl = clientUrl.replace('http//', 'http://');
     }
 
@@ -153,7 +153,11 @@ exports.vnpayReturn = async (req, res) => {
   } catch (err) {
     console.error("VNPAY return error:", err);
     let clientUrl = process.env.CLIENT_URL;
-    if (clientUrl && clientUrl.startsWith('https//')) clientUrl = clientUrl.replace('https//', 'https://');
+    if (clientUrl) {
+        clientUrl = clientUrl.replace('http://https//', 'https://');
+        clientUrl = clientUrl.replace('https//', 'https://');
+        clientUrl = clientUrl.replace('http//', 'http://');
+    }
     return res.redirect(`${clientUrl}/payment/failed?message=ServerError`);
   }
 };
