@@ -74,7 +74,12 @@ const Checkout = () => {
       const token = localStorage.getItem("token");
       setIsLoggedIn(!!token);
 
-      const headers = { "Content-Type": "application/json" };
+      let sessionId = localStorage.getItem("sessionId");
+      if (!sessionId) {
+        sessionId = "sess_" + Math.random().toString(36).substring(2) + Date.now().toString(36);
+        localStorage.setItem("sessionId", sessionId);
+      }
+      const headers = { "Content-Type": "application/json", "x-session-id": sessionId };
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
       const selectedItems = JSON.parse(localStorage.getItem("checkoutItems")) || [];
@@ -456,8 +461,14 @@ const Checkout = () => {
     setSavingNote(true);
     try {
       const token = localStorage.getItem("token");
+      let sessionId = localStorage.getItem("sessionId");
+      if (!sessionId) {
+        sessionId = "sess_" + Math.random().toString(36).substring(2) + Date.now().toString(36);
+        localStorage.setItem("sessionId", sessionId);
+      }
       const headers = {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "x-session-id": sessionId
       };
 
       if (token) {
@@ -526,7 +537,12 @@ const Checkout = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const headers = { "Content-Type": "application/json" };
+      let sessionId = localStorage.getItem("sessionId");
+      if (!sessionId) {
+        sessionId = "sess_" + Math.random().toString(36).substring(2) + Date.now().toString(36);
+        localStorage.setItem("sessionId", sessionId);
+      }
+      const headers = { "Content-Type": "application/json", "x-session-id": sessionId };
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
       const orderItems = cart.map(item => ({

@@ -21,7 +21,7 @@ exports.checkout = async (req, res) => {
     } = req.body;
 
     const userId = req.user?.id;
-    const sessionId = req.sessionID;
+    const sessionId = req.headers['x-session-id'] || req.sessionID;
 
     if (!email || !fullname || !phone || !shippingAddress) {
       return res.status(400).json({
