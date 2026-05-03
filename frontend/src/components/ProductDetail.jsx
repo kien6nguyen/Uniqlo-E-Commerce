@@ -3,7 +3,6 @@ import { Button } from "primereact/button";
 import { Rating } from "primereact/rating";
 import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
-import { Dialog } from "primereact/dialog";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
 import { useParams, useNavigate } from "react-router-dom";
@@ -29,7 +28,6 @@ const ProductDetail = () => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
   const [submittingReview, setSubmittingReview] = useState(false);
-  const [showTechVideo, setShowTechVideo] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -253,25 +251,6 @@ const ProductDetail = () => {
               <p className="text-gray-500 text-sm leading-relaxed mb-6 border-left-2 border-gray-100 pl-6 font-medium">
                 {product.description || "Một sản phẩm chất lượng cao từ Uniqlo LifeWear, mang lại sự thoải mái và phong cách vượt trội cho người mặc."}
               </p>
-
-              {/* Technology Section */}
-              <div
-                className="mb-10 cursor-pointer group block w-full bg-white border-1 border-900 hover:bg-black transition-colors duration-300"
-                onClick={() => setShowTechVideo(true)}
-              >
-                <div className="flex align-items-center justify-content-between p-4">
-                  <div className="flex align-items-center gap-4">
-                    <div className="w-2rem h-2rem flex align-items-center justify-content-center border-1 border-900 group-hover:border-white transition-colors">
-                      <i className="pi pi-play text-900 group-hover:text-white transition-colors text-xs ml-1"></i>
-                    </div>
-                    <div>
-                      <span className="block text-xs font-black text-900 group-hover:text-white tracking-[0.2em] uppercase mb-1 transition-colors">Công nghệ AIRism</span>
-                      <span className="block text-[10px] font-bold text-600 group-hover:text-400 tracking-widest uppercase transition-colors">Video giới thiệu tính năng</span>
-                    </div>
-                  </div>
-                  <i className="pi pi-arrow-right text-900 group-hover:text-white transition-colors text-sm"></i>
-                </div>
-              </div>
 
               {/* Color Selection */}
               {product.tags?.length > 0 && (
@@ -523,33 +502,6 @@ const ProductDetail = () => {
           </div>
         </div>
       </section>
-
-      {/* Tech Video Dialog */}
-      <Dialog
-        header={<div className="font-black tracking-widest uppercase text-sm">Công nghệ AIRism</div>}
-        visible={showTechVideo}
-        style={{ width: '800px', maxWidth: '95vw' }}
-        onHide={() => setShowTechVideo(false)}
-        contentStyle={{ padding: 0, backgroundColor: '#000' }}
-        headerStyle={{ borderBottom: '1px solid #eee' }}
-        modal
-        dismissableMask
-      >
-        <div className="flex justify-content-center align-items-center bg-black w-full" style={{ maxHeight: '80vh' }}>
-          {showTechVideo && (
-            <video
-              className="w-full h-auto"
-              style={{ maxHeight: '80vh', objectFit: 'contain' }}
-              src="https://image.uniqlo.com/UQ/ST3/vn/imagesgoods/482522/subvideo/vngoods_482522_sub13_video_3x4.mp4?resolution=598&streamType=hls"
-              controls
-              autoPlay
-              muted
-              loop
-              playsInline
-            />
-          )}
-        </div>
-      </Dialog>
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (
