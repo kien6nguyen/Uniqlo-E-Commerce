@@ -69,7 +69,7 @@ const ProductDetail = () => {
       if (!res.ok) throw new Error("Product not found");
       const data = await res.json();
       const productObj = data.product || data;
-      
+
       setProduct(productObj);
       setSelectedConfig(productObj.variants?.length > 0 ? productObj.variants[0]._id : "standard");
       setSelectedColor(productObj.tags?.length > 0 ? productObj.tags[0] : null);
@@ -121,7 +121,7 @@ const ProductDetail = () => {
       const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE}/reviews/products/${id}/reviews`, {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
           ...(token ? { "Authorization": `Bearer ${token}` } : {})
         },
@@ -145,7 +145,7 @@ const ProductDetail = () => {
   };
 
   const handleImageError = (e) => {
-    e.target.onerror = null; 
+    e.target.onerror = null;
     e.target.src = "https://placehold.co/600x800?text=Uniqlo+Product";
   };
 
@@ -178,7 +178,7 @@ const ProductDetail = () => {
   return (
     <div className="bg-white min-h-screen">
       <Toast ref={toast} />
-      
+
       {/* Breadcrumb */}
       <nav className="px-4 py-3 bg-[#fdfdfd] border-bottom-1 border-gray-100">
         <div className="max-w-screen-xl mx-auto flex align-items-center gap-3 text-[10px] font-black tracking-[0.15em] text-gray-500 uppercase">
@@ -198,8 +198,8 @@ const ProductDetail = () => {
               {/* Thumbnails (Side) */}
               <div className="hidden md:flex flex-column gap-2 col-2">
                 {images.map((img, i) => (
-                  <div 
-                    key={i} 
+                  <div
+                    key={i}
                     className={`aspect-square cursor-pointer border-1 transition-all p-1 rounded-sm ${activeImg === i ? 'border-black' : 'border-gray-200'}`}
                     onMouseEnter={() => setActiveImg(i)}
                   >
@@ -210,12 +210,12 @@ const ProductDetail = () => {
               {/* Main Image */}
               <div className="col-12 md:col-10">
                 <div className="relative aspect-[3/4] bg-[#f9f9f9] rounded-lg overflow-hidden group">
-                    <img 
-                      src={getImg(images[activeImg])} 
-                      alt={product.name} 
-                      className="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
-                      onError={handleImageError}
-                    />
+                  <img
+                    src={getImg(images[activeImg])}
+                    alt={product.name}
+                    className="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
+                    onError={handleImageError}
+                  />
                   {product.isHotDeal && (
                     <div className="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg uppercase tracking-widest">
                       Giảm giá sốc
@@ -238,7 +238,7 @@ const ProductDetail = () => {
               </div>
 
               <h1 className="text-3xl font-black text-[#111] mb-4 leading-tight uppercase tracking-tight">{product.name}</h1>
-              
+
               <div className="flex align-items-baseline gap-3 mb-6">
                 <span className="text-3xl font-black text-red-600">
                   {currentPrice?.toLocaleString("vi-VN")}₫
@@ -255,16 +255,21 @@ const ProductDetail = () => {
               </p>
 
               {/* Technology Section */}
-              <div 
-                className="flex align-items-center gap-3 mb-10 cursor-pointer group bg-gray-50 hover:bg-gray-100 p-3 rounded-xl transition-all border-1 border-gray-200"
+              <div
+                className="mb-10 cursor-pointer group block w-full bg-white border-1 border-900 hover:bg-black transition-colors duration-300"
                 onClick={() => setShowTechVideo(true)}
               >
-                <div className="w-10 h-10 rounded-full bg-black flex align-items-center justify-content-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                    <i className="pi pi-play text-white text-sm ml-1"></i>
-                </div>
-                <div>
-                    <span className="block text-xs font-black text-[#111] tracking-widest uppercase mb-1">Công nghệ nổi bật</span>
-                    <span className="block text-xs font-medium text-gray-600">Khám phá AIRism - Thoải mái tối đa</span>
+                <div className="flex align-items-center justify-content-between p-4">
+                  <div className="flex align-items-center gap-4">
+                    <div className="w-2rem h-2rem flex align-items-center justify-content-center border-1 border-900 group-hover:border-white transition-colors">
+                      <i className="pi pi-play text-900 group-hover:text-white transition-colors text-xs ml-1"></i>
+                    </div>
+                    <div>
+                      <span className="block text-xs font-black text-900 group-hover:text-white tracking-[0.2em] uppercase mb-1 transition-colors">Công nghệ AIRism</span>
+                      <span className="block text-[10px] font-bold text-600 group-hover:text-400 tracking-widest uppercase transition-colors">Video giới thiệu tính năng</span>
+                    </div>
+                  </div>
+                  <i className="pi pi-arrow-right text-900 group-hover:text-white transition-colors text-sm"></i>
                 </div>
               </div>
 
@@ -276,7 +281,7 @@ const ProductDetail = () => {
                   </div>
                   <div className="flex flex-wrap gap-4">
                     {product.tags.map(color => (
-                      <div 
+                      <div
                         key={color}
                         onClick={() => setSelectedColor(color)}
                         className={`border-circle cursor-pointer border-2 transition-all duration-300 p-1 flex align-items-center justify-content-center ${selectedColor === color ? 'border-900 shadow-4' : 'border-300 hover:border-600'}`}
@@ -299,7 +304,7 @@ const ProductDetail = () => {
                   <div className="grid grid-nogutter" style={{ gap: '12px' }}>
                     {product.variants.map(v => (
                       <div key={v._id} className="col">
-                        <button 
+                        <button
                           onClick={() => setSelectedConfig(v._id)}
                           className="w-full p-3 text-xs font-bold border-1 transition-all border-round uppercase cursor-pointer"
                           style={{
@@ -327,13 +332,13 @@ const ProductDetail = () => {
 
               {/* Actions */}
               <div className="flex flex-column gap-4 mb-10">
-                <button 
+                <button
                   disabled={currentStock <= 0}
                   onClick={addToCart}
                   className={`w-full p-4 text-sm font-bold uppercase transition-all border-none rounded shadow-md`}
-                  style={{ 
-                    letterSpacing: '0.2em', 
-                    backgroundColor: currentStock > 0 ? '#000000' : '#e5e7eb', 
+                  style={{
+                    letterSpacing: '0.2em',
+                    backgroundColor: currentStock > 0 ? '#000000' : '#e5e7eb',
                     color: currentStock > 0 ? '#ffffff' : '#6b7280',
                     cursor: currentStock > 0 ? 'pointer' : 'not-allowed'
                   }}
@@ -341,7 +346,7 @@ const ProductDetail = () => {
                   {currentStock > 0 ? "Thêm vào túi đồ" : "Hết hàng"}
                 </button>
                 <div className="flex gap-4">
-                  <button 
+                  <button
                     onClick={async () => {
                       if (!product) return;
                       try {
@@ -375,14 +380,14 @@ const ProductDetail = () => {
                   >
                     <i className="pi pi-heart-fill"></i> Yêu thích
                   </button>
-                  <button 
+                  <button
                     onClick={() => {
-                        if (navigator.share) {
-                          navigator.share({ title: product.name, url: window.location.href });
-                        } else {
-                          navigator.clipboard.writeText(window.location.href);
-                          toast.current.show({ severity: "info", summary: "Copy", detail: "Đã copy link sản phẩm", life: 2000 });
-                        }
+                      if (navigator.share) {
+                        navigator.share({ title: product.name, url: window.location.href });
+                      } else {
+                        navigator.clipboard.writeText(window.location.href);
+                        toast.current.show({ severity: "info", summary: "Copy", detail: "Đã copy link sản phẩm", life: 2000 });
+                      }
                     }}
                     className="flex-1 p-3 font-bold border-1 border-300 border-round uppercase surface-0 text-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all flex align-items-center justify-content-center gap-2 cursor-pointer"
                     style={{ fontSize: '10px', letterSpacing: '0.2em' }}
@@ -424,32 +429,32 @@ const ProductDetail = () => {
           <div className="flex justify-content-between align-items-end mb-6 pb-4 border-bottom-2 border-900">
             <h2 className="m-0 text-2xl font-bold uppercase tracking-tight text-900">Đánh giá từ khách hàng</h2>
             <div className="flex align-items-center gap-2 text-600">
-                <span className="text-xs font-bold uppercase tracking-widest">{comments.length} đánh giá</span>
+              <span className="text-xs font-bold uppercase tracking-widest">{comments.length} đánh giá</span>
             </div>
           </div>
-          
+
           <div className="grid">
             <div className="col-12 md:col-4 mb-6 md:mb-0 pr-0 md:pr-6">
               <div className="surface-50 p-5 border-round-xl text-center">
                 <div className="text-6xl font-black text-900 mb-2">{computedRating}</div>
                 <div className="flex justify-content-center mb-3">
-                   <Rating value={Math.round(parseFloat(computedRating))} readOnly stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-500 text-lg' }, offIcon: { className: 'text-300 text-lg' } }} />
+                  <Rating value={Math.round(parseFloat(computedRating))} readOnly stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-500 text-lg' }, offIcon: { className: 'text-300 text-lg' } }} />
                 </div>
                 <p className="text-xs font-bold text-600 uppercase mb-5" style={{ letterSpacing: '0.1em' }}>Đánh giá trung bình</p>
                 {showReviewForm ? (
                   <div className="mt-4 text-left">
                     <div className="mb-3">
                       <label className="block text-xs font-bold uppercase mb-2">Đánh giá của bạn</label>
-                      <Rating value={newReview.rating} onChange={(e) => setNewReview({...newReview, rating: e.value})} stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-500 text-xl' }, offIcon: { className: 'text-300 text-xl' } }} />
+                      <Rating value={newReview.rating} onChange={(e) => setNewReview({ ...newReview, rating: e.value })} stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-500 text-xl' }, offIcon: { className: 'text-300 text-xl' } }} />
                     </div>
                     <div className="mb-3">
                       <label className="block text-xs font-bold uppercase mb-2">Nội dung</label>
-                      <textarea 
-                        className="w-full p-2 border-1 border-300 border-round text-sm outline-none focus:border-900 transition-colors" 
-                        rows={3} 
+                      <textarea
+                        className="w-full p-2 border-1 border-300 border-round text-sm outline-none focus:border-900 transition-colors"
+                        rows={3}
                         placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."
                         value={newReview.comment}
-                        onChange={(e) => setNewReview({...newReview, comment: e.target.value})}
+                        onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
                       ></textarea>
                     </div>
                     <div className="flex gap-2">
@@ -462,14 +467,14 @@ const ProductDetail = () => {
                     </div>
                   </div>
                 ) : (
-                  <button 
+                  <button
                     onClick={() => {
-                        const token = localStorage.getItem("token");
-                        if (!token) {
-                            toast.current.show({ severity: "warn", summary: "Chú ý", detail: "Bạn cần đăng nhập để đánh giá", life: 2000 });
-                            return;
-                        }
-                        setShowReviewForm(true);
+                      const token = localStorage.getItem("token");
+                      if (!token) {
+                        toast.current.show({ severity: "warn", summary: "Chú ý", detail: "Bạn cần đăng nhập để đánh giá", life: 2000 });
+                        return;
+                      }
+                      setShowReviewForm(true);
                     }}
                     className="w-full bg-white text-black border border-black p-3 text-xs font-bold uppercase transition-all cursor-pointer hover:bg-gray-100" style={{ letterSpacing: '0.1em' }}
                   >
@@ -478,7 +483,7 @@ const ProductDetail = () => {
                 )}
               </div>
             </div>
-            
+
             <div className="col-12 md:col-8">
               {comments.length > 0 ? (
                 <div className="flex flex-column">
@@ -486,13 +491,13 @@ const ProductDetail = () => {
                     <div key={i} className="py-5 border-bottom-1 surface-border last:border-none">
                       <div className="flex justify-content-between align-items-start mb-3">
                         <div className="flex align-items-center gap-3">
-                            <div className="surface-200 text-700 border-circle flex align-items-center justify-content-center font-bold text-sm" style={{ width: '40px', height: '40px' }}>
-                                {c.user?.fullname?.charAt(0) || "U"}
-                            </div>
-                            <div className="flex flex-column gap-1">
-                                <span className="font-bold text-sm text-900">{c.user?.fullname || "Khách hàng Uniqlo"}</span>
-                                <span className="text-xs text-500">{new Date(c.createdAt || Date.now()).toLocaleDateString("vi-VN")}</span>
-                            </div>
+                          <div className="surface-200 text-700 border-circle flex align-items-center justify-content-center font-bold text-sm" style={{ width: '40px', height: '40px' }}>
+                            {c.user?.fullname?.charAt(0) || "U"}
+                          </div>
+                          <div className="flex flex-column gap-1">
+                            <span className="font-bold text-sm text-900">{c.user?.fullname || "Khách hàng Uniqlo"}</span>
+                            <span className="text-xs text-500">{new Date(c.createdAt || Date.now()).toLocaleDateString("vi-VN")}</span>
+                          </div>
                         </div>
                         <Rating value={c.rating} readOnly stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-500 text-sm' }, offIcon: { className: 'text-300 text-sm' } }} />
                       </div>
@@ -520,25 +525,29 @@ const ProductDetail = () => {
       </section>
 
       {/* Tech Video Dialog */}
-      <Dialog 
+      <Dialog
         header={<div className="font-black tracking-widest uppercase text-sm">Công nghệ AIRism</div>}
-        visible={showTechVideo} 
-        style={{ width: '800px', maxWidth: '95vw' }} 
+        visible={showTechVideo}
+        style={{ width: '800px', maxWidth: '95vw' }}
         onHide={() => setShowTechVideo(false)}
         contentStyle={{ padding: 0, backgroundColor: '#000' }}
         headerStyle={{ borderBottom: '1px solid #eee' }}
         modal
         dismissableMask
       >
-        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-          <iframe 
-            className="absolute top-0 left-0 w-full h-full"
-            src={showTechVideo ? "https://www.youtube.com/embed/Pj1L_vHDEO0?autoplay=1" : ""} 
-            title="Uniqlo Technology" 
-            frameBorder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowFullScreen
-          ></iframe>
+        <div className="flex justify-content-center align-items-center bg-black w-full" style={{ maxHeight: '80vh' }}>
+          {showTechVideo && (
+            <video
+              className="w-full h-auto"
+              style={{ maxHeight: '80vh', objectFit: 'contain' }}
+              src="https://image.uniqlo.com/UQ/ST3/vn/imagesgoods/482522/subvideo/vngoods_482522_sub13_video_3x4.mp4?resolution=598&streamType=hls"
+              controls
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+          )}
         </div>
       </Dialog>
 
@@ -550,13 +559,13 @@ const ProductDetail = () => {
             <div className="grid">
               {relatedProducts.map(p => (
                 <div key={p._id} className="col-6 md:col-4 lg:col-3">
-                  <ProductCard 
-                    id={p._id} 
-                    name={p.name} 
-                    price={p.price} 
-                    img={getImg(p.images?.[0])} 
-                    brand={p.brand} 
-                    rating={p.averageRating} 
+                  <ProductCard
+                    id={p._id}
+                    name={p.name}
+                    price={p.price}
+                    img={getImg(p.images?.[0])}
+                    brand={p.brand}
+                    rating={p.averageRating}
                   />
                 </div>
               ))}
