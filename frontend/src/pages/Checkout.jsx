@@ -127,6 +127,15 @@ const Checkout = () => {
           credentials: 'include',
           headers
         }).then(r => r.json());
+
+        const validItems = selectedItems.filter(localItem => 
+          cartSummary.items && cartSummary.items.some(dbItem => dbItem._id === localItem._id)
+        );
+        if (validItems.length !== selectedItems.length) {
+          localStorage.setItem("checkoutItems", JSON.stringify(validItems));
+          setCart(validItems);
+        }
+
         let currentDiscountsList = data.discounts || [];
         if (cartSummary.discountCode) {
           let appliedDiscountObj = currentDiscountsList.find(
