@@ -329,6 +329,24 @@ const ProductDetail = () => {
                     onClick={async () => {
                       if (!product) return;
                       try {
+                        await addOrUpdateCartItem({
+                          productId: product.id || product._id,
+                          quantity: 1,
+                          variantId: selectedConfig === "standard" ? null : selectedConfig,
+                          color: selectedColor
+                        });
+                        navigate("/checkout");
+                      } catch (e) { console.error(e); }
+                    }}
+                    className="flex-1 p-3 font-bold border-1 border-900 border-round uppercase surface-0 hover:bg-900 hover:text-white transition-all flex align-items-center justify-content-center gap-2 cursor-pointer"
+                    style={{ fontSize: '10px', letterSpacing: '0.2em' }}
+                  >
+                    Mua ngay
+                  </button>
+                  <button
+                    onClick={async () => {
+                      if (!product) return;
+                      try {
                         const token = localStorage.getItem("token");
                         if (!token) {
                           // Handle local wishlist
