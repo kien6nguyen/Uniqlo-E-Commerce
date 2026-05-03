@@ -28,10 +28,10 @@ export default function ProductManagement() {
   const [showProductDeleteDialog, setShowProductDeleteDialog] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const categories = [
-    { label: "Laptop", value: "laptop" },
-    { label: "Điện thoại", value: "phone" },
-    { label: "Màn hình", value: "monitor" },
-    { label: "Phụ kiện", value: "accessory" },
+    { label: "Nữ (Woman)", value: "woman" },
+    { label: "Nam (Man)", value: "man" },
+    { label: "Trẻ em (Kid)", value: "kid" },
+    { label: "Em bé (Baby)", value: "baby" },
   ];
 
   const [form, setForm] = useState({
@@ -731,7 +731,7 @@ export default function ProductManagement() {
               <InputText
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Ví dụ: iPhone 15 Pro Max"
+                placeholder="Ví dụ: Áo phông Uniqlo U"
                 style={{ width: '100%' }}
               />
             </div>
@@ -752,7 +752,7 @@ export default function ProductManagement() {
                 <InputText
                   value={form.brand}
                   onChange={(e) => setForm({ ...form, brand: e.target.value })}
-                  placeholder="Ví dụ: Apple"
+                  placeholder="Ví dụ: Uniqlo"
                   style={{ width: '100%' }}
                 />
               </div>

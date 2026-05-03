@@ -1,10 +1,27 @@
 import React from "react";
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom"; // 1. Import useNavigate
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { Avatar } from "primereact/avatar";
 
 export default function AdminLayout() {
   const location = useLocation();
-  const navigate = useNavigate(); // 2. Khởi tạo hook navigate
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    try {
+      const userStr = localStorage.getItem("user");
+      if (!userStr) {
+        navigate("/login");
+        return;
+      }
+      const user = JSON.parse(userStr);
+      if (user.role !== "admin") {
+        navigate("/");
+      }
+    } catch (e) {
+      navigate("/");
+    }
+  }, [navigate]);
 
   // Hàm xử lý khi bấm nút "sign out"
   const handleExitToHome = () => {

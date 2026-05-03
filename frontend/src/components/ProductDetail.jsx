@@ -3,6 +3,7 @@ import { Button } from "primereact/button";
 import { Rating } from "primereact/rating";
 import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { Dialog } from "primereact/dialog";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
 import { useParams, useNavigate } from "react-router-dom";
@@ -28,6 +29,7 @@ const ProductDetail = () => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [showTechVideo, setShowTechVideo] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -248,9 +250,23 @@ const ProductDetail = () => {
                 )}
               </div>
 
-              <p className="text-gray-500 text-sm leading-relaxed mb-10 border-left-2 border-gray-100 pl-6 font-medium">
+              <p className="text-gray-500 text-sm leading-relaxed mb-6 border-left-2 border-gray-100 pl-6 font-medium">
                 {product.description || "Một sản phẩm chất lượng cao từ Uniqlo LifeWear, mang lại sự thoải mái và phong cách vượt trội cho người mặc."}
               </p>
+
+              {/* Technology Section */}
+              <div 
+                className="flex align-items-center gap-3 mb-10 cursor-pointer group bg-gray-50 hover:bg-gray-100 p-3 rounded-xl transition-all border-1 border-gray-200"
+                onClick={() => setShowTechVideo(true)}
+              >
+                <div className="w-10 h-10 rounded-full bg-black flex align-items-center justify-content-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <i className="pi pi-play text-white text-sm ml-1"></i>
+                </div>
+                <div>
+                    <span className="block text-xs font-black text-[#111] tracking-widest uppercase mb-1">Công nghệ nổi bật</span>
+                    <span className="block text-xs font-medium text-gray-600">Khám phá AIRism - Thoải mái tối đa</span>
+                </div>
+              </div>
 
               {/* Color Selection */}
               {product.tags?.length > 0 && (
@@ -437,7 +453,7 @@ const ProductDetail = () => {
                       ></textarea>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={submitReview} disabled={submittingReview} className="flex-1 bg-black text-white border border-black p-2 text-xs font-bold uppercase cursor-pointer hover:bg-gray-800 transition-colors">
+                      <button onClick={submitReview} disabled={submittingReview} className="flex-1 bg-white text-black border border-black p-2 text-xs font-bold uppercase cursor-pointer hover:bg-gray-100 transition-colors">
                         {submittingReview ? "Đang gửi..." : "Gửi"}
                       </button>
                       <button onClick={() => setShowReviewForm(false)} className="flex-1 bg-white text-black border border-black p-2 text-xs font-bold uppercase cursor-pointer hover:bg-gray-100 transition-colors">
@@ -455,7 +471,7 @@ const ProductDetail = () => {
                         }
                         setShowReviewForm(true);
                     }}
-                    className="w-full bg-white text-black border border-black p-3 text-xs font-bold uppercase transition-all cursor-pointer hover:bg-black hover:text-white" style={{ letterSpacing: '0.1em' }}
+                    className="w-full bg-white text-black border border-black p-3 text-xs font-bold uppercase transition-all cursor-pointer hover:bg-gray-100" style={{ letterSpacing: '0.1em' }}
                   >
                     Viết đánh giá
                   </button>
@@ -502,6 +518,29 @@ const ProductDetail = () => {
           </div>
         </div>
       </section>
+
+      {/* Tech Video Dialog */}
+      <Dialog 
+        header={<div className="font-black tracking-widest uppercase text-sm">Công nghệ AIRism</div>}
+        visible={showTechVideo} 
+        style={{ width: '800px', maxWidth: '95vw' }} 
+        onHide={() => setShowTechVideo(false)}
+        contentStyle={{ padding: 0, backgroundColor: '#000' }}
+        headerStyle={{ borderBottom: '1px solid #eee' }}
+        modal
+        dismissableMask
+      >
+        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+          <iframe 
+            className="absolute top-0 left-0 w-full h-full"
+            src={showTechVideo ? "https://www.youtube.com/embed/Pj1L_vHDEO0?autoplay=1" : ""} 
+            title="Uniqlo Technology" 
+            frameBorder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowFullScreen
+          ></iframe>
+        </div>
+      </Dialog>
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (

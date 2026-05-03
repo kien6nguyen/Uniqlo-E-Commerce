@@ -580,36 +580,37 @@ const UserProfile = () => {
                                             </div>
                                         ) : (
                                             filteredOrders.map((order) => (
-                                                <div key={order.id} className="border-bottom-1 surface-border py-6 bg-white group">
-                                                    <div className="flex justify-content-between align-items-center mb-5 pb-3 border-bottom-1 border-100">
-                                                        <div className="flex flex-column gap-1">
-                                                            <span className="font-bold text-900 uppercase text-sm tracking-tight">Đơn hàng #{order.id.slice(-6).toUpperCase()}</span>
+                                                <div key={order.id} className="border-1 border-200 border-round p-4 mb-3 bg-white hover:border-900 transition-colors">
+                                                    <div className="flex justify-content-between align-items-center border-bottom-1 border-100 pb-3 mb-3">
+                                                        <div className="flex align-items-center gap-3">
+                                                            <span className="font-black text-900 uppercase text-sm tracking-widest">#{order.id.slice(-6).toUpperCase()}</span>
+                                                            <span className="text-300">|</span>
                                                             <span className="text-[10px] text-500 font-bold uppercase tracking-widest">{order.date}</span>
                                                         </div>
-                                                        <span className="border-1 border-900 text-900 text-[10px] font-bold uppercase px-2 py-1">{getStatusLabel(order.status)}</span>
+                                                        <span className="bg-gray-100 text-900 text-[10px] font-bold uppercase px-2 py-1">{getStatusLabel(order.status)}</span>
                                                     </div>
-                                                    <div className="flex flex-column gap-4">
-                                                        {order.items.map((item, idx) => (
-                                                            <div key={idx} className="flex gap-4 align-items-center">
-                                                                <div className="w-16 h-20 border-1 surface-border flex align-items-center justify-content-center p-1 bg-white overflow-hidden">
-                                                                    <img src={item.img || "/img/default.png"} alt={item.name} className="w-full h-full object-cover" />
-                                                                </div>
-                                                                <div className="flex-1 min-w-0">
-                                                                    <p className="m-0 font-bold text-900 text-sm uppercase tracking-tight truncate mb-1">{item.name}</p>
-                                                                    <div className="flex justify-content-between align-items-center mt-2">
-                                                                        <span className="text-xs font-medium text-600 uppercase tracking-widest">SL: {item.qty}</span>
-                                                                        <span className="text-sm font-bold text-900">{item.price.toLocaleString()}₫</span>
+                                                    
+                                                    <div className="flex justify-content-between align-items-center">
+                                                        <div className="flex align-items-center gap-3">
+                                                            <div className="flex gap-2">
+                                                                {order.items.slice(0, 3).map((item, idx) => (
+                                                                    <div key={idx} className="w-3rem h-4rem border-1 border-200 bg-white flex align-items-center justify-content-center overflow-hidden p-1">
+                                                                        <img src={item.img || "/img/default.png"} alt={item.name} className="max-w-full max-h-full object-cover" />
                                                                     </div>
-                                                                </div>
+                                                                ))}
+                                                                {order.items.length > 3 && (
+                                                                    <div className="w-3rem h-4rem border-1 border-200 bg-gray-50 flex align-items-center justify-content-center text-xs font-bold text-600">
+                                                                        +{order.items.length - 3}
+                                                                    </div>
+                                                                )}
                                                             </div>
-                                                        ))}
-                                                    </div>
-                                                    <div className="flex justify-content-between align-items-center mt-6 pt-4 border-top-1 border-100">
-                                                        <div className="flex flex-column gap-1">
-                                                            <span className="text-[10px] text-500 font-bold uppercase tracking-widest">Tổng thanh toán</span>
-                                                            <span className="text-xl font-black text-900 tracking-tighter">{order.total.toLocaleString()}₫</span>
+                                                            <div className="flex flex-column gap-1 ml-2">
+                                                                <span className="text-[11px] font-bold text-900 uppercase tracking-widest">{order.items.reduce((sum, item) => sum + item.qty, 0)} Sản phẩm</span>
+                                                                <span className="text-[11px] text-500 uppercase tracking-widest">Tổng: <strong className="text-900 ml-1 text-sm">{order.total.toLocaleString()}₫</strong></span>
+                                                            </div>
                                                         </div>
-                                                        <Button label="Xem chi tiết" size="small" className="border-1 border-900 surface-0 text-900 font-bold uppercase tracking-widest text-[10px] px-4 py-2 hover:bg-gray-900 hover:text-white transition-colors" onClick={() => viewOrderDetails(order)} />
+                                                        
+                                                        <Button label="Chi tiết" size="small" className="border-1 border-900 bg-white text-900 font-bold uppercase tracking-widest text-[10px] px-4 py-2 hover:bg-900 hover:text-white transition-colors" onClick={() => viewOrderDetails(order)} />
                                                     </div>
                                                 </div>
                                             ))
