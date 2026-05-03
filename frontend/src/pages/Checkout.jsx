@@ -638,14 +638,7 @@ const Checkout = () => {
   }
 
   const total = Math.max(subtotal + tax + actualShippingFee + supportFee - discountAmount - pointsDiscount, 0);
-  if (loading) {
-    return (
-      <>
-        <div className="p-5 text-center">Đang tải...</div>
-        <Footer />
-      </>
-    );
-  }
+  // Removed early return for loading to prevent Toast from unmounting
 
   return (
     <>

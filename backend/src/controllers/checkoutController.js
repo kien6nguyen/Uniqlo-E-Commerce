@@ -84,14 +84,16 @@ exports.checkout = async (req, res) => {
         cart.sessionId = undefined;
         await cart.save();
       } else {
-        if (!req.session.guestInfo) {
-          req.session.guestInfo = {};
+        if (req.session) {
+          if (!req.session.guestInfo) {
+            req.session.guestInfo = {};
+          }
+          req.session.guestInfo = {
+            fullname,
+            phone,
+            address: shippingAddress
+          };
         }
-        req.session.guestInfo = {
-          fullname,
-          phone,
-          address: shippingAddress
-        };
       }
     } else {
       user = await User.findById(userId);
