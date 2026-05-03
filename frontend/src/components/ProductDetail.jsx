@@ -169,6 +169,9 @@ const ProductDetail = () => {
   const images = product.images?.length > 0 ? product.images : ["/img/default.png"];
   const currentPrice = selectedConfig === "standard" ? product.price : (product.variants?.find(v => v._id === selectedConfig)?.price || product.price);
   const oldPrice = product.isHotDeal ? Math.round(currentPrice * 1.25) : null;
+  const computedRating = comments.length > 0
+    ? (comments.reduce((sum, c) => sum + c.rating, 0) / comments.length).toFixed(1)
+    : (product.averageRating ? parseFloat(product.averageRating).toFixed(1) : "5.0");
 
   return (
     <div className="bg-white min-h-screen">
@@ -228,7 +231,7 @@ const ProductDetail = () => {
                 <span className="text-[11px] font-black text-gray-600 tracking-[0.2em] uppercase">{product.brand || "Uniqlo LifeWear"}</span>
                 <div className="flex align-items-center gap-2 bg-yellow-50 px-3 py-1 rounded-full">
                   <i className="pi pi-star-fill text-yellow-500 text-[10px]"></i>
-                  <span className="text-[11px] font-black text-yellow-800">{product.averageRating || 4.8}</span>
+                  <span className="text-[11px] font-black text-yellow-800">{computedRating}</span>
                 </div>
               </div>
 
@@ -412,9 +415,9 @@ const ProductDetail = () => {
           <div className="grid">
             <div className="col-12 md:col-4 mb-6 md:mb-0 pr-0 md:pr-6">
               <div className="surface-50 p-5 border-round-xl text-center">
-                <div className="text-6xl font-black text-900 mb-2">{product.averageRating || 5.0}</div>
+                <div className="text-6xl font-black text-900 mb-2">{computedRating}</div>
                 <div className="flex justify-content-center mb-3">
-                   <Rating value={Math.round(product.averageRating || 5)} readOnly stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-500 text-lg' }, offIcon: { className: 'text-300 text-lg' } }} />
+                   <Rating value={Math.round(parseFloat(computedRating))} readOnly stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-500 text-lg' }, offIcon: { className: 'text-300 text-lg' } }} />
                 </div>
                 <p className="text-xs font-bold text-600 uppercase mb-5" style={{ letterSpacing: '0.1em' }}>Đánh giá trung bình</p>
                 {showReviewForm ? (
@@ -434,10 +437,10 @@ const ProductDetail = () => {
                       ></textarea>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={submitReview} disabled={submittingReview} className="flex-1 surface-900 text-white border-none p-2 text-xs font-bold uppercase cursor-pointer hover:surface-700 transition-colors">
+                      <button onClick={submitReview} disabled={submittingReview} className="flex-1 bg-black text-white border border-black p-2 text-xs font-bold uppercase cursor-pointer hover:bg-gray-800 transition-colors">
                         {submittingReview ? "Đang gửi..." : "Gửi"}
                       </button>
-                      <button onClick={() => setShowReviewForm(false)} className="flex-1 surface-0 text-900 border-1 border-900 p-2 text-xs font-bold uppercase cursor-pointer hover:surface-100 transition-colors">
+                      <button onClick={() => setShowReviewForm(false)} className="flex-1 bg-white text-black border border-black p-2 text-xs font-bold uppercase cursor-pointer hover:bg-gray-100 transition-colors">
                         Hủy
                       </button>
                     </div>
@@ -452,7 +455,7 @@ const ProductDetail = () => {
                         }
                         setShowReviewForm(true);
                     }}
-                    className="w-full surface-0 border-1 border-900 p-3 text-xs font-bold uppercase transition-all cursor-pointer hover:surface-900 hover:text-white" style={{ letterSpacing: '0.1em' }}
+                    className="w-full bg-white text-black border border-black p-3 text-xs font-bold uppercase transition-all cursor-pointer hover:bg-black hover:text-white" style={{ letterSpacing: '0.1em' }}
                   >
                     Viết đánh giá
                   </button>

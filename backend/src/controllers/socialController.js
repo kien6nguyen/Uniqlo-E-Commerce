@@ -10,5 +10,12 @@ exports.socialCallback = (req, res) => {
         phone: req.user.phone,
         role: req.user.role,
     });
-     res.redirect(`${process.env.CLIENT_URL}/api/auth/login?token=${token}`);
+    let clientUrl = process.env.CLIENT_URL;
+    if (clientUrl) {
+        clientUrl = clientUrl.replace('http://https://', 'https://');
+        clientUrl = clientUrl.replace('http://https//', 'https://');
+        clientUrl = clientUrl.replace('https//', 'https://');
+        clientUrl = clientUrl.replace('http//', 'http://');
+    }
+    res.redirect(`${clientUrl}/api/auth/login?token=${token}`);
 };

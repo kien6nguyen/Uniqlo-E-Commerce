@@ -34,6 +34,7 @@ exports.createVnpayPayment = async (req, res) => {
     const vnpUrl = process.env.VNP_URL;
     let returnUrl = process.env.VNP_RETURN_URL;
     if (returnUrl) {
+        returnUrl = returnUrl.replace('http://https://', 'https://');
         returnUrl = returnUrl.replace('http://https//', 'https://');
         returnUrl = returnUrl.replace('https//', 'https://');
         returnUrl = returnUrl.replace('http//', 'http://');
@@ -102,6 +103,7 @@ exports.vnpayReturn = async (req, res) => {
     const secretKey = process.env.VNP_HASH_SECRET;
     let clientUrl = process.env.CLIENT_URL;
     if (clientUrl) {
+        clientUrl = clientUrl.replace('http://https://', 'https://');
         clientUrl = clientUrl.replace('http://https//', 'https://');
         clientUrl = clientUrl.replace('https//', 'https://');
         clientUrl = clientUrl.replace('http//', 'http://');
@@ -154,6 +156,7 @@ exports.vnpayReturn = async (req, res) => {
     console.error("VNPAY return error:", err);
     let clientUrl = process.env.CLIENT_URL;
     if (clientUrl) {
+        clientUrl = clientUrl.replace('http://https://', 'https://');
         clientUrl = clientUrl.replace('http://https//', 'https://');
         clientUrl = clientUrl.replace('https//', 'https://');
         clientUrl = clientUrl.replace('http//', 'http://');

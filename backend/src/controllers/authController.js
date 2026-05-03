@@ -143,7 +143,14 @@ exports.sendResetLink = async (req, res) => {
         }
 
         const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "5m" });
-        const resetLink = `${process.env.CLIENT_URL}/resetPassword?token=${token}`;
+        let clientUrl = process.env.CLIENT_URL;
+        if (clientUrl) {
+            clientUrl = clientUrl.replace('http://https://', 'https://');
+            clientUrl = clientUrl.replace('http://https//', 'https://');
+            clientUrl = clientUrl.replace('https//', 'https://');
+            clientUrl = clientUrl.replace('http//', 'http://');
+        }
+        const resetLink = `${clientUrl}/resetPassword?token=${token}`;
 
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
@@ -190,6 +197,13 @@ exports.resetPassword = async (req, res) => {
 
 exports.googleCallback = (req, res) => {
     const token = signToken({ id: req.user._id, email: req.user.email, role: req.user.role });
+    let clientUrl = process.env.CLIENT_URL;
+    if (clientUrl) {
+        clientUrl = clientUrl.replace('http://https://', 'https://');
+        clientUrl = clientUrl.replace('http://https//', 'https://');
+        clientUrl = clientUrl.replace('https//', 'https://');
+        clientUrl = clientUrl.replace('http//', 'http://');
+    }
     // Redirect to frontend with token
-    res.redirect(`${process.env.CLIENT_URL}/oauth-success?token=${token}`);
+    res.redirect(`${clientUrl}/oauth-success?token=${token}`);
 };
