@@ -585,7 +585,7 @@ const Checkout = () => {
         return;
       }
       if (paymentMethod === 'vnpay') {
-        const paymentResponse = await fetch(`${API_BASE}/payments/vnpay/create`, {
+        const paymentResponse = await fetch(`${API_BASE_NOUSER}/payments/vnpay/create`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
