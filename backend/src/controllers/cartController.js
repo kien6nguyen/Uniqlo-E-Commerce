@@ -40,7 +40,7 @@ async function recalcCart(cart) {
 exports.addOrUpdateItem = async (req, res) => {
   try {
     const userId = req.user?.id;
-    const sessionId = req.sessionID;
+    const sessionId = req.headers['x-session-id'] || req.sessionID;
 
     const { productId, quantity = 1, variantId = null, color = null } = req.body;
 
@@ -162,7 +162,7 @@ exports.updateItemQuantity = exports.addOrUpdateItem;
 exports.removeItem = async (req, res) => {
   try {
     const userId = req.user?.id;
-    const sessionId = req.sessionID;
+    const sessionId = req.headers['x-session-id'] || req.sessionID;
     const productId = req.params.productId;
 
     const { variantId = null, color = null } = req.query;
@@ -203,7 +203,7 @@ exports.removeItem = async (req, res) => {
 exports.clearCart = async (req, res) => {
   try {
     const userId = req.user?.id;
-    const sessionId = req.sessionID;
+    const sessionId = req.headers['x-session-id'] || req.sessionID;
 
     let cart = await findCart(userId, sessionId);
 
@@ -231,7 +231,7 @@ exports.clearCart = async (req, res) => {
 exports.getCartSummary = async (req, res) => {
   try {
     const userId = req.user?.id;
-    const sessionId = req.sessionID;
+    const sessionId = req.headers['x-session-id'] || req.sessionID;
 
     const cart = await findCart(userId, sessionId);
 
@@ -296,7 +296,7 @@ exports.applyDiscountCode = async (req, res) => {
   try {
     const { code } = req.body;
     const userId = req.user?.id;
-    const sessionId = req.sessionID;
+    const sessionId = req.headers['x-session-id'] || req.sessionID;
 
     if (!code) {
       return res.status(400).json({ success: false, message: "Vui lòng nhập mã giảm giá" });
@@ -359,7 +359,7 @@ exports.applyDiscountCode = async (req, res) => {
 exports.removeDiscountCode = async (req, res) => {
   try {
     const userId = req.user?.id;
-    const sessionId = req.sessionID;
+    const sessionId = req.headers['x-session-id'] || req.sessionID;
 
     const cart = await findCart(userId, sessionId);
 
@@ -404,7 +404,7 @@ exports.removeDiscountCode = async (req, res) => {
 exports.updateCartNote = async (req, res) => {
   try {
     const userId = req.user?.id;
-    const sessionId = req.sessionID;
+    const sessionId = req.headers['x-session-id'] || req.sessionID;
     const { note } = req.body;
 
     let cart = await findCart(userId, sessionId);

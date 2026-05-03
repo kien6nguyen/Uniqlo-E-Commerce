@@ -2,8 +2,15 @@ const API_BASE = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api
 
 function getAuthHeaders() {
   const token = localStorage.getItem("token");
+  let sessionId = localStorage.getItem("sessionId");
+  if (!sessionId) {
+    sessionId = "sess_" + Math.random().toString(36).substring(2) + Date.now().toString(36);
+    localStorage.setItem("sessionId", sessionId);
+  }
+
   const headers = {
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
+    "x-session-id": sessionId
   };
 
   if (token) {
