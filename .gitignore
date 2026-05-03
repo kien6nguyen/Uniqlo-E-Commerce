@@ -41,3 +41,5 @@ coverage/
 .env.*
 *.env
 backend/.env
+tech_stack.txt
+

@@ -25,6 +25,9 @@ const ProductDetail = () => {
   const [currentStock, setCurrentStock] = useState(0);
   const [activeImg, setActiveImg] = useState(0);
   const [isSticky, setIsSticky] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -104,6 +107,39 @@ const ProductDetail = () => {
       toast.current.show({ severity: "success", summary: "Thành công", detail: "Đã thêm vào giỏ hàng", life: 2000 });
       window.dispatchEvent(new Event("cartUpdated"));
     } catch (err) { console.error(err); }
+  };
+
+  const submitReview = async () => {
+    if (!newReview.comment.trim()) {
+      toast.current.show({ severity: "warn", summary: "Chú ý", detail: "Vui lòng nhập nội dung đánh giá", life: 2000 });
+      return;
+    }
+    setSubmittingReview(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE}/reviews/products/${id}/reviews`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify(newReview)
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.current.show({ severity: "success", summary: "Thành công", detail: "Đã gửi đánh giá", life: 2000 });
+        setShowReviewForm(false);
+        setNewReview({ rating: 5, comment: "" });
+        fetchReviews();
+        fetchProduct();
+      } else {
+        toast.current.show({ severity: "error", summary: "Lỗi", detail: data.message || "Không thể gửi đánh giá", life: 2000 });
+      }
+    } catch (err) {
+      toast.current.show({ severity: "error", summary: "Lỗi", detail: "Có lỗi xảy ra", life: 2000 });
+    } finally {
+      setSubmittingReview(false);
+    }
   };
 
   const handleImageError = (e) => {
@@ -381,9 +417,46 @@ const ProductDetail = () => {
                    <Rating value={Math.round(product.averageRating || 5)} readOnly stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-500 text-lg' }, offIcon: { className: 'text-300 text-lg' } }} />
                 </div>
                 <p className="text-xs font-bold text-600 uppercase mb-5" style={{ letterSpacing: '0.1em' }}>Đánh giá trung bình</p>
-                <button className="w-full surface-0 border-1 border-900 p-3 text-xs font-bold uppercase transition-all cursor-pointer hover:surface-900 hover:text-white" style={{ letterSpacing: '0.1em' }}>
-                  Viết đánh giá
-                </button>
+                {showReviewForm ? (
+                  <div className="mt-4 text-left">
+                    <div className="mb-3">
+                      <label className="block text-xs font-bold uppercase mb-2">Đánh giá của bạn</label>
+                      <Rating value={newReview.rating} onChange={(e) => setNewReview({...newReview, rating: e.value})} stars={5} cancel={false} pt={{ onIcon: { className: 'text-yellow-500 text-xl' }, offIcon: { className: 'text-300 text-xl' } }} />
+                    </div>
+                    <div className="mb-3">
+                      <label className="block text-xs font-bold uppercase mb-2">Nội dung</label>
+                      <textarea 
+                        className="w-full p-2 border-1 border-300 border-round text-sm outline-none focus:border-900 transition-colors" 
+                        rows={3} 
+                        placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."
+                        value={newReview.comment}
+                        onChange={(e) => setNewReview({...newReview, comment: e.target.value})}
+                      ></textarea>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={submitReview} disabled={submittingReview} className="flex-1 surface-900 text-white border-none p-2 text-xs font-bold uppercase cursor-pointer hover:surface-700 transition-colors">
+                        {submittingReview ? "Đang gửi..." : "Gửi"}
+                      </button>
+                      <button onClick={() => setShowReviewForm(false)} className="flex-1 surface-0 text-900 border-1 border-900 p-2 text-xs font-bold uppercase cursor-pointer hover:surface-100 transition-colors">
+                        Hủy
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button 
+                    onClick={() => {
+                        const token = localStorage.getItem("token");
+                        if (!token) {
+                            toast.current.show({ severity: "warn", summary: "Chú ý", detail: "Bạn cần đăng nhập để đánh giá", life: 2000 });
+                            return;
+                        }
+                        setShowReviewForm(true);
+                    }}
+                    className="w-full surface-0 border-1 border-900 p-3 text-xs font-bold uppercase transition-all cursor-pointer hover:surface-900 hover:text-white" style={{ letterSpacing: '0.1em' }}
+                  >
+                    Viết đánh giá
+                  </button>
+                )}
               </div>
             </div>
             
